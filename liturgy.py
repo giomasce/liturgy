@@ -10,7 +10,7 @@ def get_prev_sunday(date):
     return date - datetime.timedelta(days=date.weekday() + 1)
 
 def get_next_sunday(date):
-    return date + date.timedelta(days=7 - (date.weekday() + 1) % 7)
+    return date + datetime.timedelta(days=7 - (date.weekday() + 1) % 7)
 
 def get_christmas(year):
     return datetime.date(year, 12, 25)
@@ -52,6 +52,7 @@ def get_christ_king(year):
 
 DIGIT_MAP = {0: 2, 1: 1}
 LETTER_MAP = {0: 'C', 1: 'A', 2: 'B'}
+PSALTER_WEEK_MAP = {0: 4, 1: 1, 2: 2, 3: 3}
 
 SEASON_ADVENT = 0
 SEASON_CHRISTMAS = 1
@@ -70,7 +71,7 @@ def get_season_beginning(ref_year, season):
         week_num = 1
     elif season == SEASON_CHRISTMAS:
         first_day = get_christmas(ref_year - 1)
-        ref_sunday = get_prev_sunday(first_day)
+        ref_sunday = get_next_sunday(first_day)
         week_num = 1
     elif season == SEASON_ORDINARY_I:
         ref_sunday = get_baptism(ref_year)
@@ -106,6 +107,7 @@ class LitDate(datetime.date):
         self.digit = DIGIT_MAP[self.ref_year % 2]
         self.letter = LETTER_MAP[self.ref_year % 3]
         self.season, self.week = self.get_season()
+        self.psalter_week = PSALTER_WEEK_MAP[self.week % 4]
 
     def get_season(self):
         for season in xrange(SEASON_NUM-1, -1, -1):
