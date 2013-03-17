@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 TYPE_SOLEMNITY = 0
-TYPE_FEAST = 1
-TYPE_MEMORY = 2
-TYPE_OPTIONAL_MEMORY = 3
+TYPE_LORD_FEAST = 1
+TYPE_FEAST = 2
+TYPE_MEMORY = 3
+TYPE_OPTIONAL_MEMORY = 4
 
 GENERAL_CALENDAR_LIST = [
     (1, 1, u"Maria SS. Madre di Dio", TYPE_SOLEMNITY),
@@ -24,7 +25,7 @@ GENERAL_CALENDAR_LIST = [
     (1, 28, u"S. Tommaso d'Aquino, sacerdote e dottore della Chiesa", TYPE_MEMORY),
     (1, 31, u"S. Giovanni Bosco, sacerdote", TYPE_MEMORY),
 
-    (2, 2, u"Presentazione del Signore", TYPE_FEAST),
+    (2, 2, u"Presentazione del Signore", TYPE_LORD_FEAST),
     (2, 3, u"S. Biagio, vescovo e martire", TYPE_OPTIONAL_MEMORY),
     (2, 4, u"S. Ansgario (Oscar), vescovo", TYPE_OPTIONAL_MEMORY),
     (2, 5, u"S. Agata, vergine e martire", TYPE_MEMORY),
@@ -127,7 +128,7 @@ GENERAL_CALENDAR_LIST = [
     (8, 2, u"S. Pier Giuliano Eymard, sacerdote", TYPE_OPTIONAL_MEMORY),
     (8, 4, u"S. Giovanni Maria Vianney, sacertode", TYPE_MEMORY),
     (8, 5, u"Dedicazione della Basilica di S. Maria Maggiore", TYPE_OPTIONAL_MEMORY),
-    (8, 6, u"Trasfigurazione del Signore", TYPE_FEAST),
+    (8, 6, u"Trasfigurazione del Signore", TYPE_LORD_FEAST),
     (8, 7, u"Ss. Sisto II, papa, e compagni, martiri", TYPE_OPTIONAL_MEMORY),
     (8, 7, u"S. Gaetano, sacerdote", TYPE_OPTIONAL_MEMORY),
     (8, 8, u"S. Domenico, sacerdote", TYPE_MEMORY),
@@ -156,7 +157,7 @@ GENERAL_CALENDAR_LIST = [
     (9, 9, u"S. Pietro Claver, sacerdote", TYPE_OPTIONAL_MEMORY),
     (9, 12, u"SS. Nome di Maria", TYPE_OPTIONAL_MEMORY),
     (9, 13, u"S. Giovanni Crisostomo, vescovo e dottore della Chiesa", TYPE_MEMORY),
-    (9, 14, u"Esaltazione della Santa Croce", TYPE_FEAST),
+    (9, 14, u"Esaltazione della Santa Croce", TYPE_LORD_FEAST),
     (9, 15, u"Beata Vergine Maria Addolorata", TYPE_MEMORY),
     (9, 16, u"Ss. Cornelio, papa, e Cipriano, vescovo, martiri", TYPE_MEMORY),
     (9, 17, u"S. Roberto Bellarmino, vescovo e dottore della Chiesa", TYPE_OPTIONAL_MEMORY),
@@ -191,7 +192,9 @@ GENERAL_CALENDAR_LIST = [
     (10, 28, u"Ss. Simone e Giuda, apostoli", TYPE_FEAST),
 
     (11, 1, u"Tutti i santi", TYPE_SOLEMNITY),
-    (11, 2, u"Commemoriazione di tutti i fedeli defunti", TYPE_MEMORY),
+    # Techincally "commemorazione" is not a solemnity, but it is
+    # granted the same priority level
+    (11, 2, u"Commemoriazione di tutti i fedeli defunti", TYPE_SOLEMNITY),
     (11, 3, u"S. Martino de Porres, religioso", TYPE_OPTIONAL_MEMORY),
     (11, 4, u"S. Carlo Borromeo, vescovo", TYPE_MEMORY),
     (11, 9, u"Dedicazione della Basilica Lateranense", TYPE_FEAST),
