@@ -129,9 +129,10 @@ class LitDate(datetime.date):
 
     def get_base_competitor(self):
         is_sunday = self.weekday() == WD_SUNDAY
-        title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[self.weekday()],
-                                      int_to_roman(self.week),
-                                      SEASONS_ITALIAN[self.season])
+        if self.week > 0:
+            title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[self.weekday()],
+                                          int_to_roman(self.week),
+                                          SEASONS_ITALIAN[self.season])
 
         if self.season == SEASON_ADVENT:
             if is_sunday:
@@ -201,7 +202,7 @@ class LitDate(datetime.date):
         res = []
         res.append(self.get_base_competitor())
         res += self.get_calendar_competitors()
-        return res
+        return sorted(res, key=lambda x: x[0])
 
 if __name__ == '__main__':
     import locale
@@ -210,8 +211,6 @@ if __name__ == '__main__':
     for date in iterlityeardates(2013):
         ld = LitDate.from_date(date)
         print u'%s (%s, anno: %d)' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year)
-        for comp in sorted(ld.get_competitors()):
+        for comp in ld.get_competitors():
             print u'  %2d: %s' % comp
         print
-    #print LitDate(2013, 4, 22).get_competitors()
-    #print LitDate(2013, 12, 25).get_competitors()

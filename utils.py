@@ -73,9 +73,6 @@ def int_to_roman(input):
    """
    if type(input) != type(1):
       raise TypeError, "expected integer, got %s" % type(input)
-   # Temporary: return "0" to 0
-   if input == 0:
-       return "0"
    if not 0 < input < 4000:
       raise ValueError, "Argument must be between 1 and 3999"   
    ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
