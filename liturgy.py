@@ -7,6 +7,7 @@ import datetime
 import calendar
 
 from general_calendar import *
+from utils import int_to_roman, iteryeardates
 
 def get_prev_sunday(date):
     return date - datetime.timedelta(days=date.weekday() + 1)
@@ -58,7 +59,7 @@ def get_easter(year):
     day = f % 31 + 1    
     return datetime.date(year, month, day)
 
-def get_easter_octave(yar):
+def get_easter_octave(year):
     return get_easter(year) + datetime.timedelta(days=7)
 
 def get_ascension(year):
@@ -81,6 +82,35 @@ SEASON_LENT = 3
 SEASON_EASTER = 4
 SEASON_ORDINARY_II = 5
 SEASON_NUM = 6
+
+WD_MONDAY = 0
+WD_TUESDAY = 1
+WD_WEDNESDAY = 2
+WD_THURSDAY = 3
+WD_FRIDAY = 4
+WD_SATURDAY = 5
+WD_SUNDAY = 6
+
+WEEKDAYS_ITALIAN = {
+    WD_MONDAY: u'lunedì',
+    WD_TUESDAY: u'martedì',
+    WD_WEDNESDAY: u'mercoledì',
+    WD_THURSDAY: u'giovedì',
+    WD_FRIDAY: u'venerdì',
+    WD_SATURDAY: u'sabato',
+    WD_SUNDAY: u'domenica',
+}
+
+SEASONS_ITALIAN = {
+    SEASON_ADVENT: 'tempo di avvento',
+    SEASON_CHRISTMAS: 'tempo di Natale',
+    SEASON_ORDINARY_I: 'tempo ordinario',
+    SEASON_LENT: 'tempo di quaresima',
+    SEASON_EASTER: 'tempo di Pasqua',
+    SEASON_ORDINARY_II: 'tempo ordinario',
+}
+
+BASE_TITLE_ITALIAN = '%s della %s settimana del %s'
 
 def get_season_beginning(ref_year, season):
     """Returns (first_day, ref_sunday, week_num)."""
@@ -147,6 +177,10 @@ class LitDate(datetime.date):
         self.season, self.week = self.get_season()
         self.psalter_week = PSALTER_WEEK_MAP[self.week % 4]
 
+    @classmethod
+    def from_date(cls, date):
+        return LitDate(date.year, date.month, date.day)
+
     def get_season(self):
         for season in xrange(SEASON_NUM-1, -1, -1):
             first_day, ref_sunday, week_num = get_season_beginning(self.ref_year, season)
@@ -155,11 +189,11 @@ class LitDate(datetime.date):
                 return (season, week)
 
     def get_base_priority(self):
-        is_sunday = self.weekday() == datetime.SUNDAY
+        is_sunday = self.weekday() == WD_SUNDAY
 
         if self.season == SEASON_ADVENT:
             if is_sunday:
-                return PRI_CHIRSTMAS
+                return PRI_CHRISTMAS
             if self < get_novena_beginning(self.ref_year - 1):
                 return PRI_WEEKDAYS
             return PRI_STRONG_WEEKDAYS
@@ -168,7 +202,7 @@ class LitDate(datetime.date):
             if self == get_christmas(self.ref_year - 1):
                 return PRI_CHRISTMAS
             if self == get_epiphany(self.ref_year):
-                return PRI_CHISTMAS
+                return PRI_CHRISTMAS
             if is_sunday:
                 return PRI_SUNDAYS
             if self < get_christmas_octave(self.ref_year):
@@ -176,7 +210,7 @@ class LitDate(datetime.date):
             return PRI_WEEKDAYS
 
         elif self.season == SEASON_LENT:
-            if self == get_ash_days(self.ref_year):
+            if self == get_ash_day(self.ref_year):
                 return PRI_CHRISTMAS
             if self >= get_holy_thursday(self.ref_year):
                 return PRI_TRIDUUM
@@ -204,8 +238,30 @@ class LitDate(datetime.date):
                 return PRI_SUNDAYS
             return PRI_WEEKDAYS
 
+    def get_base_competitor(self):
+        title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[self.weekday()],
+                                      int_to_roman(self.week),
+                                      SEASONS_ITALIAN[self.season])
+        return (self.get_base_priority(), title)
+
     def get_calendar_competitors(self):
         res = []
+        if (self.month, self.day) not in GENERAL_CALENDAR:
+            return []
         for title, type_ in GENERAL_CALENDAR[(self.month, self.day)]:
             priority = TYPE_TO_PRIORITY[type_]
             res.append((priority, title))
+        return res
+
+    def get_competitors(self):
+        res = []
+        res.append(self.get_base_competitor())
+        res += self.get_calendar_competitors()
+        return res
+
+if __name__ == '__main__':
+    for date in iteryeardates(2013):
+        ld = LitDate.from_date(date)
+        print date, sorted(ld.get_competitors())
+    #print LitDate(2013, 4, 22).get_competitors()
+    #print LitDate(2013, 12, 25).get_competitors()
