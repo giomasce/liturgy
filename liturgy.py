@@ -115,6 +115,8 @@ class LitDate(datetime.date):
         self.letter = LETTER_MAP[self.ref_year % 3]
         self.season, self.week = self.get_season()
         self.psalter_week = PSALTER_WEEK_MAP[self.week % 4]
+        self.slid = False
+        self.competitors = self.get_competitors()
 
     @classmethod
     def from_date(cls, date):
@@ -204,13 +206,44 @@ class LitDate(datetime.date):
         res += self.get_calendar_competitors()
         return sorted(res, key=lambda x: x[0])
 
+def build_lit_year(year):
+    lit_year = [LitDate.from_date(date) for date in iterlityeardates(year)]
+
+    # Compute sliding of solemnities
+    queue = []
+    for lit_date in lit_year:
+        priorities = set(map(lambda x: x[0], lit_date.competitors))
+
+        # Does this day requires sliding?
+        if PRI_TRIDUUM in priorities or PRI_CHRISTMAS in priorities:
+            for competitor in lit_date.competitors:
+                if competitor[0] == PRI_SOLEMNITIES or competitor[0] == PRI_LOCAL_SOLEMNITIES:
+                    queue.append(competitor)
+
+        # Does this day receive sliding?
+        elif len(queue) > 0 and min(priorities) >= PRI_STRONG_WEEKDAYS:
+            lit_date.competitors.insert(0, queue.pop(0))
+            lit_date.slid = True
+
+    assert len(queue) == 0
+
+    return lit_year
+
+def print_year(year):
+    lit_year = build_lit_year(year)
+    for ld in lit_year:
+        print u'%s (%s, anno: %d)%s' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year, ' *' if ld.slid else '')
+        for comp in ld.competitors:
+            print u'  %2d: %s' % comp
+        print
+
+def test_years():
+    for year in range(1900, 2100):
+        build_lit_year(year)
+
 if __name__ == '__main__':
     import locale
     import codecs
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-    for date in iterlityeardates(2013):
-        ld = LitDate.from_date(date)
-        print u'%s (%s, anno: %d)' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year)
-        for comp in ld.get_competitors():
-            print u'  %2d: %s' % comp
-        print
+    print_year(int(sys.argv[1]))
+    #test_years()
