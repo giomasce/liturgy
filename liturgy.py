@@ -22,10 +22,10 @@ def get_advent_first(year):
     return first
 
 def get_novena_beginning(year):
-    return datetime.date(year, 12, 17)
+    return datetime.date(year - 1, 12, 17)
 
 def get_christmas(year):
-    return datetime.date(year, 12, 25)
+    return datetime.date(year - 1, 12, 25)
 
 def get_christmas_octave(year):
     return datetime.date(year, 1, 1)
@@ -69,7 +69,7 @@ def get_pentecost(year):
     return get_easter(year) + datetime.timedelta(days=49)
 
 def get_christ_king(year):
-    return get_advent_first(year) - datetime.timedelta(days=7)
+    return get_advent_first(year + 1) - datetime.timedelta(days=7)
 
 DIGIT_MAP = {0: 2, 1: 1}
 LETTER_MAP = {0: 'C', 1: 'A', 2: 'B'}
@@ -115,11 +115,11 @@ BASE_TITLE_ITALIAN = '%s della %s settimana del %s'
 def get_season_beginning(ref_year, season):
     """Returns (first_day, ref_sunday, week_num)."""
     if season == SEASON_ADVENT:
-        first_day = get_advent_first(ref_year - 1)
+        first_day = get_advent_first(ref_year)
         ref_sunday = first_day
         week_num = 1
     elif season == SEASON_CHRISTMAS:
-        first_day = get_christmas(ref_year - 1)
+        first_day = get_christmas(ref_year)
         ref_sunday = get_next_sunday(first_day)
         week_num = 1
     elif season == SEASON_ORDINARY_I:
@@ -171,7 +171,7 @@ class LitDate(datetime.date):
 
     def __init__(self, year, month, day):
         datetime.date.__init__(self, year, month, day)
-        self.ref_year = year if self < get_advent_first(year) else year + 1
+        self.ref_year = year if self < get_advent_first(year + 1) else year + 1
         self.digit = DIGIT_MAP[self.ref_year % 2]
         self.letter = LETTER_MAP[self.ref_year % 3]
         self.season, self.week = self.get_season()
@@ -188,61 +188,66 @@ class LitDate(datetime.date):
                 week = (self - ref_sunday).days / 7 + week_num
                 return (season, week)
 
-    def get_base_priority(self):
-        is_sunday = self.weekday() == WD_SUNDAY
-
-        if self.season == SEASON_ADVENT:
-            if is_sunday:
-                return PRI_CHRISTMAS
-            if self < get_novena_beginning(self.ref_year - 1):
-                return PRI_WEEKDAYS
-            return PRI_STRONG_WEEKDAYS
-
-        elif self.season == SEASON_CHRISTMAS:
-            if self == get_christmas(self.ref_year - 1):
-                return PRI_CHRISTMAS
-            if self == get_epiphany(self.ref_year):
-                return PRI_CHRISTMAS
-            if is_sunday:
-                return PRI_SUNDAYS
-            if self < get_christmas_octave(self.ref_year):
-                return PRI_STRONG_WEEKDAYS
-            return PRI_WEEKDAYS
-
-        elif self.season == SEASON_LENT:
-            if self == get_ash_day(self.ref_year):
-                return PRI_CHRISTMAS
-            if self >= get_holy_thursday(self.ref_year):
-                return PRI_TRIDUUM
-            if is_sunday:
-                return PRI_CHRISTMAS
-            if self > get_palm_day(self.ref_year):
-                return PRI_CHRISTMAS
-            return PRI_STRONG_WEEKDAYS
-
-        elif self.season == SEASON_EASTER:
-            if self == get_easter(self.ref_year):
-                return PRI_TRIDUUM
-            if self == get_ascension(self.ref_year):
-                return PRI_CHRISTMAS
-            if self == get_pentecost(self.ref_year):
-                return PRI_CHRISTMAS
-            if is_sunday:
-                return PRI_CHRISTMAS
-            if self < get_easter_octave(self.ref_year):
-                return PRI_CHRISTMAS
-            return PRI_WEEKDAYS
-
-        elif self.season == SEASON_ORDINARY_I or self.season == SEASON_ORDINARY_II:
-            if is_sunday:
-                return PRI_SUNDAYS
-            return PRI_WEEKDAYS
-
     def get_base_competitor(self):
+        is_sunday = self.weekday() == WD_SUNDAY
         title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[self.weekday()],
                                       int_to_roman(self.week),
                                       SEASONS_ITALIAN[self.season])
-        return (self.get_base_priority(), title)
+
+        if self.season == SEASON_ADVENT:
+            if is_sunday:
+                return PRI_CHRISTMAS, title
+            if self < get_novena_beginning(self.ref_year):
+                return PRI_WEEKDAYS, title
+            return PRI_STRONG_WEEKDAYS, title
+
+        elif self.season == SEASON_CHRISTMAS:
+            if self == get_christmas(self.ref_year):
+                return PRI_CHRISTMAS, u'Natale del Signore'
+            if self == get_epiphany(self.ref_year):
+                return PRI_CHRISTMAS, u'Epifania del Signore'
+            if self == get_baptism(self.ref_year):
+                return PRI_SUNDAYS, u'Battesimo del Signore'
+            if is_sunday:
+                return PRI_SUNDAYS, title
+            if self < get_christmas_octave(self.ref_year):
+                return PRI_STRONG_WEEKDAYS, u"%s dell'ottava di Natale" % (WEEKDAYS_ITALIAN[self.weekday()])
+            return PRI_WEEKDAYS, title
+
+        elif self.season == SEASON_LENT:
+            if self == get_ash_day(self.ref_year):
+                return PRI_CHRISTMAS, u'Mercoledì delle Ceneri'
+            if self >= get_holy_thursday(self.ref_year):
+                return PRI_TRIDUUM, u'%s santo' % (WEEKDAYS_ITALIAN[self.weekday()].capitalize())
+            if self == get_palm_day(self.ref_year):
+                return PRI_CHRISTMAS, u'Domenica delle Palme'
+            if self.week == 0:
+                return PRI_STRONG_WEEKDAYS, u'%s dopo le Ceneri' % (WEEKDAYS_ITALIAN[self.weekday()])
+            if is_sunday:
+                return PRI_CHRISTMAS, title
+            if self > get_palm_day(self.ref_year):
+                return PRI_CHRISTMAS, u'%s santo' % (WEEKDAYS_ITALIAN[self.weekday()].capitalize())
+            return PRI_STRONG_WEEKDAYS, title
+
+        elif self.season == SEASON_EASTER:
+            if self == get_easter(self.ref_year):
+                return PRI_TRIDUUM, u'Pasqua di Resurrezione'
+            if self == get_ascension(self.ref_year):
+                return PRI_CHRISTMAS, u'Ascensione del Signore'
+            if self == get_pentecost(self.ref_year):
+                return PRI_CHRISTMAS, u'Domenica di Pentecose'
+            if is_sunday:
+                return PRI_CHRISTMAS, title
+            if self < get_easter_octave(self.ref_year):
+                return PRI_CHRISTMAS, u"%s dell'ottava di Pasqua" % (WEEKDAYS_ITALIAN[self.weekday()])
+            return PRI_WEEKDAYS, title
+
+        elif self.season == SEASON_ORDINARY_I or self.season == SEASON_ORDINARY_II:
+            if self == get_christ_king(self.ref_year):
+                return PRI_SUNDAYS, u"Nostro Signore Gesù Cristo Re dell'Universo"
+            if is_sunday:
+                return PRI_SUNDAYS, title
+            return PRI_WEEKDAYS, title
 
     def get_calendar_competitors(self):
         res = []
@@ -260,8 +265,14 @@ class LitDate(datetime.date):
         return res
 
 if __name__ == '__main__':
+    import locale
+    import codecs
+    sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
     for date in iteryeardates(2013):
         ld = LitDate.from_date(date)
-        print date, sorted(ld.get_competitors())
+        print u'%s (%s, anno: %d)' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year)
+        for comp in sorted(ld.get_competitors()):
+            print u'  %2d: %s' % comp
+        print
     #print LitDate(2013, 4, 22).get_competitors()
     #print LitDate(2013, 12, 25).get_competitors()

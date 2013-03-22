@@ -10,7 +10,7 @@ TYPE_OPTIONAL_MEMORY = 4
 GENERAL_CALENDAR_LIST = [
     (1, 1, u"Maria SS. Madre di Dio", TYPE_SOLEMNITY),
     (1, 2, u"Ss. Basilio Magno e Gregorio Nazianzeno, vescovi e dottori della Chiesa", TYPE_MEMORY),
-    (1, 6, u"Epifania del Signore", TYPE_SOLEMNITY),
+    #(1, 6, u"Epifania del Signore", TYPE_SOLEMNITY),
     (1, 7, u"S. Raimondo da Peñafort", TYPE_OPTIONAL_MEMORY),
     (1, 13, u"S. Ilario, vescovo e dottore della Chiesa", TYPE_OPTIONAL_MEMORY),
     (1, 17, u"S. Antonio, abate", TYPE_MEMORY),
@@ -226,7 +226,7 @@ GENERAL_CALENDAR_LIST = [
     (12, 14, u"S. Giovanni della Croce, sacerdote e dottore della Chiesa", TYPE_MEMORY),
     (12, 21, u"S. Pietro Canisio, sacerdote e dottore della Chiesa", TYPE_OPTIONAL_MEMORY),
     (12, 23, u"S. Giovanni da Kety", TYPE_OPTIONAL_MEMORY),
-    (12, 25, u"Natale del Signore", TYPE_SOLEMNITY),
+    #(12, 25, u"Natale del Signore", TYPE_SOLEMNITY),
     (12, 26, u"S. Stefano, primo martire", TYPE_FEAST),
     (12, 27, u"S. Giovanni, apostolo ed evangelista", TYPE_FEAST),
     (12, 28, u"Ss. Innocenti, martiri", TYPE_FEAST),
