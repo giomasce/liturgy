@@ -8,7 +8,7 @@ import calendar
 
 from general_calendar import *
 from movable_dates import *
-from utils import int_to_roman, iteryeardates
+from utils import int_to_roman, iteryeardates, iterlityeardates
 
 DIGIT_MAP = {0: 2, 1: 1}
 LETTER_MAP = {0: 'C', 1: 'A', 2: 'B'}
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     import locale
     import codecs
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-    for date in iteryeardates(2013):
+    for date in iterlityeardates(2013):
         ld = LitDate.from_date(date)
         print u'%s (%s, anno: %d)' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year)
         for comp in sorted(ld.get_competitors()):

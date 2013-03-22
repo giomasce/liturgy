@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import calendar
+import datetime
 from datetime import date
+
+from movable_dates import get_advent_first
 
 def real_itermonthdays(year, month):
     for day in calendar.Calendar().itermonthdays(year, month):
@@ -15,6 +18,13 @@ def iteryeardates(year):
     for month in range(1, 13):
         for day in real_itermonthdays(year, month):
             yield date(year, month, day)
+
+def iterlityeardates(year):
+    start = get_advent_first(year)
+    stop = get_advent_first(year + 1)
+    while start < stop:
+        yield start
+        start += datetime.timedelta(days=1)
 
 # Taken from: http://code.activestate.com/recipes/81611-roman-numerals/
 def int_to_roman(input):
