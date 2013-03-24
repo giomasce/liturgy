@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import datetime
+
+from movable_dates import get_pentecost, get_saint_family
+
 TYPE_SOLEMNITY = 0
 TYPE_LORD_FEAST = 1
 TYPE_FEAST = 2
@@ -239,3 +243,17 @@ for month, day, title, rank in GENERAL_CALENDAR_LIST:
     if (month, day) not in GENERAL_CALENDAR:
         GENERAL_CALENDAR[(month, day)] = []
     GENERAL_CALENDAR[(month, day)].append((title, rank))
+
+def compute_movable_calendar(year):
+    saint_family = get_saint_family(year)
+    pentecost = get_pentecost(year)
+
+    movable_calendar = {
+        saint_family: [(u"Santa Famiglia di Gesù, Maria e Giuseppe", TYPE_LORD_FEAST)],
+        pentecost + datetime.timedelta(days=7): [(u"SS. Trinità", TYPE_SOLEMNITY)],
+        pentecost + datetime.timedelta(days=14): [(u"SS. Corpo e Sangue di Cristo", TYPE_SOLEMNITY)],
+        pentecost + datetime.timedelta(days=19): [(u"Sacratissimo Cuore di Gesù", TYPE_SOLEMNITY)],
+        pentecost + datetime.timedelta(days=20): [(u"Cuore Immacolato della beata Vergine Maria", TYPE_MEMORY)],
+        }
+
+    return movable_calendar

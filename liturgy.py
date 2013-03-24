@@ -116,20 +116,24 @@ class LitDate(datetime.date):
         self.season, self.week = self.get_season()
         self.psalter_week = PSALTER_WEEK_MAP[self.week % 4]
         self.slid = False
-        self.competitors = self.get_competitors()
+
+    def provide_movable_calendar(self, movable_calendar):
+        self.competitors = self._get_competitors(movable_calendar)
 
     @classmethod
-    def from_date(cls, date):
-        return LitDate(date.year, date.month, date.day)
+    def from_date(cls, date, movable_calendar=None):
+        ld = LitDate(date.year, date.month, date.day)
+        ld.provide_movable_calendar(movable_calendar)
+        return ld
 
     def get_season(self):
-        for season in xrange(SEASON_NUM-1, -1, -1):
+        for season in xrange(SEASON_NUM - 1, -1, -1):
             first_day, ref_sunday, week_num = get_season_beginning(self.ref_year, season)
             if self >= first_day:
                 week = (self - ref_sunday).days / 7 + week_num
                 return (season, week)
 
-    def get_base_competitor(self):
+    def _get_base_competitor(self):
         is_sunday = self.weekday() == WD_SUNDAY
         if self.week > 0:
             title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[self.weekday()],
@@ -177,7 +181,7 @@ class LitDate(datetime.date):
             if self == get_ascension(self.ref_year):
                 return PRI_CHRISTMAS, u'Ascensione del Signore'
             if self == get_pentecost(self.ref_year):
-                return PRI_CHRISTMAS, u'Domenica di Pentecose'
+                return PRI_CHRISTMAS, u'Domenica di Pentecoste'
             if is_sunday:
                 return PRI_CHRISTMAS, title
             if self < get_easter_octave(self.ref_year):
@@ -191,7 +195,7 @@ class LitDate(datetime.date):
                 return PRI_SUNDAYS, title
             return PRI_WEEKDAYS, title
 
-    def get_calendar_competitors(self):
+    def _get_calendar_competitors(self):
         res = []
         if (self.month, self.day) not in GENERAL_CALENDAR:
             return []
@@ -200,14 +204,26 @@ class LitDate(datetime.date):
             res.append((priority, title))
         return res
 
-    def get_competitors(self):
+    def _get_movable_calendar_competitors(self, movable_calendar):
         res = []
-        res.append(self.get_base_competitor())
-        res += self.get_calendar_competitors()
+        if self not in movable_calendar:
+            return []
+        for title, type_ in movable_calendar[self]:
+            priority = TYPE_TO_PRIORITY[type_]
+            res.append((priority, title))
+        return res
+
+    def _get_competitors(self, movable_calendar):
+        res = []
+        res.append(self._get_base_competitor())
+        res += self._get_calendar_competitors()
+        if movable_calendar is not None:
+            res += self._get_movable_calendar_competitors(movable_calendar)
         return sorted(res, key=lambda x: x[0])
 
 def build_lit_year(year):
-    lit_year = [LitDate.from_date(date) for date in iterlityeardates(year)]
+    movable_calendar = compute_movable_calendar(year)
+    lit_year = [LitDate.from_date(date, movable_calendar) for date in iterlityeardates(year)]
 
     # Compute sliding of solemnities
     queue = []

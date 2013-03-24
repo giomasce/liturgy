@@ -21,6 +21,13 @@ def get_novena_beginning(year):
 def get_christmas(year):
     return datetime.date(year - 1, 12, 25)
 
+def get_saint_family(year):
+    christmas = get_christmas(year)
+    saint_family = get_next_sunday(christmas)
+    if saint_family >= get_christmas_octave(year):
+        saint_family = datetime.date(year - 1, 12, 30)
+    return saint_family
+
 def get_christmas_octave(year):
     return datetime.date(year, 1, 1)
 
