@@ -3,13 +3,8 @@
 
 import datetime
 
+from constants import *
 from movable_dates import get_pentecost, get_saint_family
-
-TYPE_SOLEMNITY = 0
-TYPE_LORD_FEAST = 1
-TYPE_FEAST = 2
-TYPE_MEMORY = 3
-TYPE_OPTIONAL_MEMORY = 4
 
 GENERAL_CALENDAR_LIST = [
     (1, 1, u"Maria SS. Madre di Dio", TYPE_SOLEMNITY),
