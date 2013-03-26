@@ -166,8 +166,9 @@ class LitDate(datetime.date):
         res = []
         if self not in movable_calendar:
             return []
-        for title, priority in movable_calendar[self]:
-            res.append((priority, title))
+        for event in movable_calendar[self]:
+            priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
+            res.append((priority, event.title))
         return res
 
     def _get_competitors(self, movable_calendar):
@@ -193,8 +194,7 @@ def compute_movable_calendar(year, session):
                      "pentecost": pentecost})
         if date not in movable_calendar:
             movable_calendar[date] = []
-        priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
-        movable_calendar[date].append((event.title, priority))
+        movable_calendar[date].append(event)
 
     return movable_calendar
 
