@@ -14,7 +14,7 @@ class Event(Base):
 
     id = Column(Integer, primary_key=True)
     class_type = Column(String, nullable=False)
-    type = Column(String, nullable=True)
+    type = Column(Integer, nullable=True)
     priority = Column(Integer, nullable=True)
     title = Column(String, nullable=False)
 
