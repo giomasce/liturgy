@@ -239,16 +239,48 @@ for month, day, title, rank in GENERAL_CALENDAR_LIST:
         GENERAL_CALENDAR[(month, day)] = []
     GENERAL_CALENDAR[(month, day)].append((title, rank))
 
+# Bad, but temporary
+MOVABLE_CALENDAR_STR = {
+    "saint_family": [(u"Santa Famiglia di Gesù, Maria e Giuseppe", TYPE_LORD_FEAST)],
+    "pentecost + datetime.timedelta(days=7)": [(u"SS. Trinità", TYPE_SOLEMNITY)],
+    "pentecost + datetime.timedelta(days=14)": [(u"SS. Corpo e Sangue di Cristo", TYPE_SOLEMNITY)],
+    "pentecost + datetime.timedelta(days=19)": [(u"Sacratissimo Cuore di Gesù", TYPE_SOLEMNITY)],
+    "pentecost + datetime.timedelta(days=20)": [(u"Cuore Immacolato della beata Vergine Maria", TYPE_MEMORY)],
+    }
+
 def compute_movable_calendar(year):
     saint_family = get_saint_family(year)
     pentecost = get_pentecost(year)
 
-    movable_calendar = {
-        saint_family: [(u"Santa Famiglia di Gesù, Maria e Giuseppe", TYPE_LORD_FEAST)],
-        pentecost + datetime.timedelta(days=7): [(u"SS. Trinità", TYPE_SOLEMNITY)],
-        pentecost + datetime.timedelta(days=14): [(u"SS. Corpo e Sangue di Cristo", TYPE_SOLEMNITY)],
-        pentecost + datetime.timedelta(days=19): [(u"Sacratissimo Cuore di Gesù", TYPE_SOLEMNITY)],
-        pentecost + datetime.timedelta(days=20): [(u"Cuore Immacolato della beata Vergine Maria", TYPE_MEMORY)],
-        }
+    movable_calendar = {}
+    for calc_func, data in MOVABLE_CALENDAR_STR.iteritems():
+        # TODO - Unsecure, but temporary
+        movable_calendar[eval(calc_func)] = data
 
     return movable_calendar
+
+def populate_database():
+    import database
+    database.Base.metadata.create_all()
+    session = database.Session()
+
+    for month, day, title, type_ in GENERAL_CALENDAR_LIST:
+        fe = database.FixedEvent()
+        fe.day = day
+        fe.month = month
+        fe.type = type_
+        fe.title = title
+        #fe.priority = TYPE_TO_PRIORITY[type_]
+        session.add(fe)
+
+    for calc_func, data in MOVABLE_CALENDAR_STR.iteritems():
+        me = database.MovableEvent()
+        me.type = data[0][1]
+        me.title = data[0][0]
+        me.calc_func = calc_func
+        session.add(me)
+
+    session.commit()
+
+if __name__ == '__main__':
+    populate_database()
