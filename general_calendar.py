@@ -344,6 +344,100 @@ def populate_base_competitors(session):
     me.title = u'Battesimo del Signore'
     session.add(me)
 
+    # Ordinary time
+    for week in xrange(1, 35):
+        for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                        WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+            if (week, weekday) == (1, WD_SUNDAY):
+                continue
+            title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[weekday],
+                                          int_to_roman(week),
+                                          SEASONS_ITALIAN[SEASON_ORDINARY])
+            if (week, weekday) == (34, WD_SUNDAY):
+                title = u"Nostro Signore Gesù Cristo Re dell'Universo"
+            te = database.TimedEvent()
+            te.week = week
+            te.weekday = weekday
+            te.season = SEASON_ORDINARY
+            te.title = title
+            te.priority = PRI_SUNDAYS if weekday == WD_SUNDAY else PRI_WEEKDAYS
+            session.add(te)
+
+    # Ash day and following ones
+    for weekday in [WD_WEDNESDAY, WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+        te = database.TimedEvent()
+        te.season = SEASON_LENT
+        te.week = 0
+        te.weekday = weekday
+        te.priority = PRI_CHRISTMAS if weekday == WD_WEDNESDAY else PRI_STRONG_WEEKDAYS
+        te.title = u'Mercoledì delle Ceneri' if weekday == WD_WEDNESDAY else u'%s dopo le Ceneri' % (WEEKDAYS_ITALIAN[weekday])
+        session.add(te)
+
+    # Lent
+    for week in xrange(1, 6):
+        for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                        WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+            title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[weekday],
+                                          int_to_roman(week),
+                                          SEASONS_ITALIAN[SEASON_LENT])
+            te = database.TimedEvent()
+            te.week = week
+            te.weekday = weekday
+            te.season = SEASON_LENT
+            te.title = title
+            te.priority = PRI_CHRISTMAS if weekday == WD_SUNDAY else PRI_STRONG_WEEKDAYS
+            session.add(te)
+
+    # Holy week
+    for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                    WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+        title = u'Domenica delle Palme' if weekday == WD_SUNDAY else u'%s Santo' % (WEEKDAYS_ITALIAN[weekday].capitalize())
+        te = database.TimedEvent()
+        te.week = 6
+        te.weekday = weekday
+        te.season = SEASON_LENT
+        te.title = title
+        te.priority = PRI_TRIDUUM if weekday in [WD_THURSDAY, WD_FRIDAY, WD_SATURDAY] else PRI_CHRISTMAS
+        session.add(te)
+
+    # Easter
+    for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                    WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+        title = u'Pasqua di Resurrezione' if weekday == WD_SUNDAY else u"%s fra l'ottava di Pasqua" % (WEEKDAYS_ITALIAN[weekday])
+        te = database.TimedEvent()
+        te.week = 1
+        te.weekday = weekday
+        te.season = SEASON_EASTER
+        te.title = title
+        te.priority = PRI_TRIDUUM if weekday == WD_SUNDAY else PRI_CHRISTMAS
+        session.add(te)
+
+    # Easter time
+    for week in xrange(2, 8):
+        for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                        WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+            title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[weekday],
+                                          int_to_roman(week),
+                                          SEASONS_ITALIAN[SEASON_EASTER])
+            if (week, weekday) == (7, WD_SUNDAY):
+                title = u'Ascensione del Signore'
+            te = database.TimedEvent()
+            te.week = week
+            te.weekday = weekday
+            te.season = SEASON_EASTER
+            te.title = title
+            te.priority = PRI_CHRISTMAS if weekday == WD_SUNDAY else PRI_WEEKDAYS
+            session.add(te)
+
+    # Pentecost
+    te = database.TimedEvent()
+    te.week = 8
+    te.weekday = WD_SUNDAY
+    te.season = SEASON_EASTER
+    te.title = u'Domenica di Pentecoste'
+    te.priority = PRI_CHRISTMAS
+    session.add(te)
+
 def populate_database():
     import database
     database.Base.metadata.create_all()

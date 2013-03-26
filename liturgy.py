@@ -71,69 +71,10 @@ class LitDate(datetime.date):
             first_day, ref_sunday, week_num = get_season_beginning(self.ref_year, season)
             if self >= first_day:
                 week = (self - ref_sunday).days / 7 + week_num
+                # TODO - Fix this bad hack
+                if season == SEASON_ORDINARY_I or season == SEASON_ORDINARY_II:
+                    season = SEASON_ORDINARY
                 return (season, week)
-
-    def _get_base_competitor(self):
-        is_sunday = self.weekday() == WD_SUNDAY
-        if self.week > 0:
-            title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[self.weekday()],
-                                          int_to_roman(self.week),
-                                          SEASONS_ITALIAN[self.season])
-
-        if self.season == SEASON_ADVENT:
-            if is_sunday:
-                return PRI_CHRISTMAS, title
-            if self < get_novena_beginning(self.ref_year):
-                return PRI_WEEKDAYS, title
-            return PRI_STRONG_WEEKDAYS, title
-
-        elif self.season == SEASON_CHRISTMAS:
-            if self == get_christmas(self.ref_year):
-                return PRI_CHRISTMAS, u'Natale del Signore'
-            if self == get_epiphany(self.ref_year):
-                return PRI_CHRISTMAS, u'Epifania del Signore'
-            if self == get_baptism(self.ref_year):
-                return PRI_SUNDAYS, u'Battesimo del Signore'
-            if is_sunday:
-                return PRI_SUNDAYS, title
-            if self < get_christmas_octave(self.ref_year):
-                return PRI_STRONG_WEEKDAYS, u"%s dell'ottava di Natale" % (WEEKDAYS_ITALIAN[self.weekday()])
-            return PRI_WEEKDAYS, title
-
-        elif self.season == SEASON_LENT:
-            if self == get_ash_day(self.ref_year):
-                return PRI_CHRISTMAS, u'Mercoledì delle Ceneri'
-            if self >= get_holy_thursday(self.ref_year):
-                return PRI_TRIDUUM, u'%s santo' % (WEEKDAYS_ITALIAN[self.weekday()].capitalize())
-            if self == get_palm_day(self.ref_year):
-                return PRI_CHRISTMAS, u'Domenica delle Palme'
-            if self.week == 0:
-                return PRI_STRONG_WEEKDAYS, u'%s dopo le Ceneri' % (WEEKDAYS_ITALIAN[self.weekday()])
-            if is_sunday:
-                return PRI_CHRISTMAS, title
-            if self > get_palm_day(self.ref_year):
-                return PRI_CHRISTMAS, u'%s santo' % (WEEKDAYS_ITALIAN[self.weekday()].capitalize())
-            return PRI_STRONG_WEEKDAYS, title
-
-        elif self.season == SEASON_EASTER:
-            if self == get_easter(self.ref_year):
-                return PRI_TRIDUUM, u'Pasqua di Resurrezione'
-            if self == get_ascension(self.ref_year):
-                return PRI_CHRISTMAS, u'Ascensione del Signore'
-            if self == get_pentecost(self.ref_year):
-                return PRI_CHRISTMAS, u'Domenica di Pentecoste'
-            if is_sunday:
-                return PRI_CHRISTMAS, title
-            if self < get_easter_octave(self.ref_year):
-                return PRI_CHRISTMAS, u"%s dell'ottava di Pasqua" % (WEEKDAYS_ITALIAN[self.weekday()])
-            return PRI_WEEKDAYS, title
-
-        elif self.season == SEASON_ORDINARY_I or self.season == SEASON_ORDINARY_II:
-            if self == get_christ_king(self.ref_year):
-                return PRI_SUNDAYS, u"Nostro Signore Gesù Cristo Re dell'Universo"
-            if is_sunday:
-                return PRI_SUNDAYS, title
-            return PRI_WEEKDAYS, title
 
     def _get_fixed_competitors(self):
         res = []
@@ -162,7 +103,6 @@ class LitDate(datetime.date):
 
     def _get_competitors(self, movable_calendar):
         res = []
-        #res.append(self._get_base_competitor())
         res += self._get_fixed_competitors()
         res += self._get_timed_competitors()
         res += self._get_movable_competitors(movable_calendar)
@@ -177,8 +117,8 @@ def compute_movable_calendar(year, session):
                     {"__builtin__": None,
                      "datetime": datetime},
                     {"saint_family": get_saint_family(year),
-                     "pentecost": get_pentecost(year),
-                     "baptism": get_baptism(year)})
+                     "baptism": get_baptism(year),
+                     "pentecost": get_pentecost(year),})
         if date not in movable_calendar:
             movable_calendar[date] = []
         movable_calendar[date].append(event)
