@@ -133,12 +133,12 @@ class LitDate(datetime.date):
                 return PRI_SUNDAYS, title
             return PRI_WEEKDAYS, title
 
-    def _get_calendar_competitors(self):
+    def _get_fixed_competitors(self):
         res = []
         for event in self.session.query(FixedEvent).filter(FixedEvent.day == self.day). \
                 filter(FixedEvent.month == self.month):
             priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
-            res.append((priority, event.title))
+            res.append((priority, event))
         return res
 
     def _get_timed_competitors(self):
@@ -146,25 +146,24 @@ class LitDate(datetime.date):
         for event in self.session.query(TimedEvent).filter(TimedEvent.season == self.season). \
                 filter(TimedEvent.week == self.week).filter(TimedEvent.weekday == self.weekday()):
             priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
-            res.append((priority, event.title))
+            res.append((priority, event))
         return res
 
-    def _get_movable_calendar_competitors(self, movable_calendar):
+    def _get_movable_competitors(self, movable_calendar):
         res = []
         if self not in movable_calendar:
             return []
         for event in movable_calendar[self]:
             priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
-            res.append((priority, event.title))
+            res.append((priority, event))
         return res
 
     def _get_competitors(self, movable_calendar):
         res = []
         #res.append(self._get_base_competitor())
-        res += self._get_calendar_competitors()
+        res += self._get_fixed_competitors()
         res += self._get_timed_competitors()
-        if movable_calendar is not None:
-            res += self._get_movable_calendar_competitors(movable_calendar)
+        res += self._get_movable_competitors(movable_calendar)
         return sorted(res, key=lambda x: x[0])
 
 def compute_movable_calendar(year, session):
@@ -217,7 +216,7 @@ def print_year(year):
     for ld in lit_year:
         print u'%s (%s, anno: %d)%s' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year, ' *' if ld.slid else '')
         for comp in ld.competitors:
-            print u'  %2d: %s' % comp
+            print u'  %2d: %s' % (comp[0], comp[1].title)
         print
 
 def test_years():
