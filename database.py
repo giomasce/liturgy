@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
-db = create_engine('sqlite:///liturgy.sqlite', echo=True)
+db = create_engine('sqlite:///liturgy.sqlite', echo=False)
 Session = sessionmaker(db)
 Base = declarative_base(db)
 
@@ -27,6 +27,7 @@ class FixedEvent(Event):
     id = Column(Integer, ForeignKey(Event.id), primary_key=True)
     day = Column(Integer, nullable=False)
     month = Column(Integer, nullable=False)
+    season = Column(Integer, nullable=True)
 
 class TimedEvent(Event):
     __tablename__ = 'timed_events'

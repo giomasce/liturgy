@@ -264,7 +264,6 @@ def populate_base_competitors(session):
     import database
 
     # Advent
-    season = SEASON_ADVENT
     pairs = []
     for week in [1, 2]:
         for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
@@ -278,26 +277,24 @@ def populate_base_competitors(session):
     for week, weekday in pairs:
         title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[weekday],
                                       int_to_roman(week),
-                                      SEASONS_ITALIAN[season])
+                                      SEASONS_ITALIAN[SEASON_ADVENT])
         te = database.TimedEvent()
         te.week = week
         te.weekday = weekday
-        te.season = season
+        te.season = SEASON_ADVENT
         te.title = title
         te.priority = PRI_CHRISTMAS if weekday == WD_SUNDAY else PRI_WEEKDAYS
         session.add(te)
 
-    month = 12
     for day in xrange(17, 25):
         fe = database.FixedEvent()
         fe.day = day
-        fe.month = month
+        fe.month = 12
         fe.title = u'%d dicembre' % (day)
         fe.priority = PRI_STRONG_WEEKDAYS
         session.add(fe)
 
     # Christmas
-    season = SEASON_CHRISTMAS
     fe = database.FixedEvent()
     fe.day = 25
     fe.month = 12
@@ -305,6 +302,47 @@ def populate_base_competitors(session):
     fe.priority = PRI_CHRISTMAS
     session.add(fe)
 
+    # Octave after Christmas
+    for day in xrange(29, 32):
+        fe = database.FixedEvent()
+        fe.day = day
+        fe.month = 12
+        fe.title = u'%d dicembre' % (day)
+        fe.priority = PRI_STRONG_WEEKDAYS
+        session.add(fe)
+
+    # Sunday after Christmas
+    te = database.TimedEvent()
+    te.week = 2
+    te.weekday = WD_SUNDAY
+    te.season = SEASON_CHRISTMAS
+    te.title = u'seconda domenica dopo Natale'
+    te.priority = PRI_SUNDAYS
+
+    # Weekdays in January
+    for day in range(2, 6) + range(7, 13):
+        fe = database.FixedEvent()
+        fe.day = day
+        fe.month = 1
+        fe.season = SEASON_CHRISTMAS
+        fe.title = u'%d gennaio' % (day)
+        fe.priority = PRI_WEEKDAYS
+        session.add(fe)
+
+    # Epiphany
+    fe = database.FixedEvent()
+    fe.day = 6
+    fe.month = 1
+    fe.title = u'Epifania del Signore'
+    fe.priority = PRI_CHRISTMAS
+    session.add(fe)
+
+    # Baptism
+    me = database.MovableEvent()
+    me.calc_func = 'baptism'
+    me.priority = PRI_SUNDAYS
+    me.title = u'Battesimo del Signore'
+    session.add(me)
 
 def populate_database():
     import database

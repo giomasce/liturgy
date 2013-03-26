@@ -6,6 +6,8 @@ import os
 import datetime
 import calendar
 
+from sqlalchemy import or_
+
 from constants import *
 from movable_dates import *
 from utils import int_to_roman, iteryeardates, iterlityeardates
@@ -136,7 +138,7 @@ class LitDate(datetime.date):
     def _get_fixed_competitors(self):
         res = []
         for event in self.session.query(FixedEvent).filter(FixedEvent.day == self.day). \
-                filter(FixedEvent.month == self.month):
+                filter(FixedEvent.month == self.month).filter(or_(FixedEvent.season == None, FixedEvent.season == self.season)):
             priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
             res.append((priority, event))
         return res
@@ -167,9 +169,6 @@ class LitDate(datetime.date):
         return sorted(res, key=lambda x: x[0])
 
 def compute_movable_calendar(year, session):
-    saint_family = get_saint_family(year)
-    pentecost = get_pentecost(year)
-
     movable_calendar = {}
     for event in session.query(MovableEvent):
         # See http://lybniz2.sourceforge.net/safeeval.html about the
@@ -177,8 +176,9 @@ def compute_movable_calendar(year, session):
         date = eval(event.calc_func,
                     {"__builtin__": None,
                      "datetime": datetime},
-                    {"saint_family": saint_family,
-                     "pentecost": pentecost})
+                    {"saint_family": get_saint_family(year),
+                     "pentecost": get_pentecost(year),
+                     "baptism": get_baptism(year)})
         if date not in movable_calendar:
             movable_calendar[date] = []
         movable_calendar[date].append(event)
