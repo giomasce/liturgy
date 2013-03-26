@@ -11,27 +11,6 @@ from movable_dates import *
 from utils import int_to_roman, iteryeardates, iterlityeardates
 from database import Session, FixedEvent, MovableEvent, TimedEvent
 
-WEEKDAYS_ITALIAN = {
-    WD_MONDAY: u'lunedì',
-    WD_TUESDAY: u'martedì',
-    WD_WEDNESDAY: u'mercoledì',
-    WD_THURSDAY: u'giovedì',
-    WD_FRIDAY: u'venerdì',
-    WD_SATURDAY: u'sabato',
-    WD_SUNDAY: u'domenica',
-}
-
-SEASONS_ITALIAN = {
-    SEASON_ADVENT: 'tempo di avvento',
-    SEASON_CHRISTMAS: 'tempo di Natale',
-    SEASON_ORDINARY_I: 'tempo ordinario',
-    SEASON_LENT: 'tempo di quaresima',
-    SEASON_EASTER: 'tempo di Pasqua',
-    SEASON_ORDINARY_II: 'tempo ordinario',
-}
-
-BASE_TITLE_ITALIAN = '%s della %s settimana del %s'
-
 def get_season_beginning(ref_year, season):
     """Returns (first_day, ref_sunday, week_num)."""
     if season == SEASON_ADVENT:
@@ -162,6 +141,14 @@ class LitDate(datetime.date):
             res.append((priority, event.title))
         return res
 
+    def _get_timed_competitors(self):
+        res = []
+        for event in self.session.query(TimedEvent).filter(TimedEvent.season == self.season). \
+                filter(TimedEvent.week == self.week).filter(TimedEvent.weekday == self.weekday()):
+            priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
+            res.append((priority, event.title))
+        return res
+
     def _get_movable_calendar_competitors(self, movable_calendar):
         res = []
         if self not in movable_calendar:
@@ -173,8 +160,9 @@ class LitDate(datetime.date):
 
     def _get_competitors(self, movable_calendar):
         res = []
-        res.append(self._get_base_competitor())
+        #res.append(self._get_base_competitor())
         res += self._get_calendar_competitors()
+        res += self._get_timed_competitors()
         if movable_calendar is not None:
             res += self._get_movable_calendar_competitors(movable_calendar)
         return sorted(res, key=lambda x: x[0])

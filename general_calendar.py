@@ -5,6 +5,7 @@ import datetime
 
 from constants import *
 from movable_dates import get_pentecost, get_saint_family
+from utils import int_to_roman
 
 GENERAL_CALENDAR_LIST = [
     (1, 1, u"Maria SS. Madre di Dio", TYPE_SOLEMNITY),
@@ -259,6 +260,52 @@ def compute_movable_calendar(year):
 
     return movable_calendar
 
+def populate_base_competitors(session):
+    import database
+
+    # Advent
+    season = SEASON_ADVENT
+    pairs = []
+    for week in [1, 2]:
+        for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                        WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+            pairs.append((week, weekday))
+    week = 3
+    for weekday in [WD_SUNDAY, WD_MONDAY, WD_TUESDAY, WD_WEDNESDAY,
+                    WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
+        pairs.append((week, weekday))
+    pairs.append((4, WD_SUNDAY))
+    for week, weekday in pairs:
+        title = BASE_TITLE_ITALIAN % (WEEKDAYS_ITALIAN[weekday],
+                                      int_to_roman(week),
+                                      SEASONS_ITALIAN[season])
+        te = database.TimedEvent()
+        te.week = week
+        te.weekday = weekday
+        te.season = season
+        te.title = title
+        te.priority = PRI_CHRISTMAS if weekday == WD_SUNDAY else PRI_WEEKDAYS
+        session.add(te)
+
+    month = 12
+    for day in xrange(17, 25):
+        fe = database.FixedEvent()
+        fe.day = day
+        fe.month = month
+        fe.title = u'%d dicembre' % (day)
+        fe.priority = PRI_STRONG_WEEKDAYS
+        session.add(fe)
+
+    # Christmas
+    season = SEASON_CHRISTMAS
+    fe = database.FixedEvent()
+    fe.day = 25
+    fe.month = 12
+    fe.title = u'Natale del Signore'
+    fe.priority = PRI_CHRISTMAS
+    session.add(fe)
+
+
 def populate_database():
     import database
     database.Base.metadata.create_all()
@@ -279,6 +326,8 @@ def populate_database():
         me.title = data[0][0]
         me.calc_func = calc_func
         session.add(me)
+
+    populate_base_competitors(session)
 
     session.commit()
 
