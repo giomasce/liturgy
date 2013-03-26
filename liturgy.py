@@ -7,9 +7,9 @@ import datetime
 import calendar
 
 from constants import *
-from general_calendar import *
 from movable_dates import *
 from utils import int_to_roman, iteryeardates, iterlityeardates
+from database import Session, FixedEvent, MovableEvent, TimedEvent
 
 WEEKDAYS_ITALIAN = {
     WD_MONDAY: u'lunedì',
@@ -75,13 +75,14 @@ class LitDate(datetime.date):
         self.psalter_week = PSALTER_WEEK_MAP[self.week % 4]
         self.slid = False
 
-    def provide_movable_calendar(self, movable_calendar):
+    def provide_movable_calendar(self, movable_calendar, session):
+        self.session = session
         self.competitors = self._get_competitors(movable_calendar)
 
     @classmethod
-    def from_date(cls, date, movable_calendar=None):
+    def from_date(cls, date, movable_calendar, session):
         ld = LitDate(date.year, date.month, date.day)
-        ld.provide_movable_calendar(movable_calendar)
+        ld.provide_movable_calendar(movable_calendar, session)
         return ld
 
     def get_season(self):
@@ -155,19 +156,17 @@ class LitDate(datetime.date):
 
     def _get_calendar_competitors(self):
         res = []
-        if (self.month, self.day) not in GENERAL_CALENDAR:
-            return []
-        for title, type_ in GENERAL_CALENDAR[(self.month, self.day)]:
-            priority = TYPE_TO_PRIORITY[type_]
-            res.append((priority, title))
+        for event in self.session.query(FixedEvent).filter(FixedEvent.day == self.day). \
+                filter(FixedEvent.month == self.month):
+            priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
+            res.append((priority, event.title))
         return res
 
     def _get_movable_calendar_competitors(self, movable_calendar):
         res = []
         if self not in movable_calendar:
             return []
-        for title, type_ in movable_calendar[self]:
-            priority = TYPE_TO_PRIORITY[type_]
+        for title, priority in movable_calendar[self]:
             res.append((priority, title))
         return res
 
@@ -179,9 +178,31 @@ class LitDate(datetime.date):
             res += self._get_movable_calendar_competitors(movable_calendar)
         return sorted(res, key=lambda x: x[0])
 
+def compute_movable_calendar(year, session):
+    saint_family = get_saint_family(year)
+    pentecost = get_pentecost(year)
+
+    movable_calendar = {}
+    for event in session.query(MovableEvent):
+        # See http://lybniz2.sourceforge.net/safeeval.html about the
+        # security of calling eval()
+        date = eval(event.calc_func,
+                    {"__builtin__": None,
+                     "datetime": datetime},
+                    {"saint_family": saint_family,
+                     "pentecost": pentecost})
+        if date not in movable_calendar:
+            movable_calendar[date] = []
+        priority = event.priority if event.priority is not None else TYPE_TO_PRIORITY[event.type]
+        movable_calendar[date].append((event.title, priority))
+
+    return movable_calendar
+
 def build_lit_year(year):
-    movable_calendar = compute_movable_calendar(year)
-    lit_year = [LitDate.from_date(date, movable_calendar) for date in iterlityeardates(year)]
+    session = Session()
+    movable_calendar = compute_movable_calendar(year, session)
+    lit_year = [LitDate.from_date(date, movable_calendar, session) for date in iterlityeardates(year)]
+    session.close()
 
     # Compute sliding of solemnities
     queue = []
