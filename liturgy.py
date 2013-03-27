@@ -149,6 +149,10 @@ def build_lit_year(year):
 
     assert len(queue) == 0
 
+    # Check that in every date there is exactly one winner
+    for lit_date in lit_year:
+        assert len(lit_date.competitors) == 1 or lit_date.competitors[0][0] != lit_date.competitors[1][0]
+
     return lit_year
 
 def print_year(year):
