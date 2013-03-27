@@ -234,12 +234,6 @@ GENERAL_CALENDAR_LIST = [
     (12, 31, u"S. Silvestro I, papa", TYPE_OPTIONAL_MEMORY),
 ]
 
-GENERAL_CALENDAR = {}
-for month, day, title, rank in GENERAL_CALENDAR_LIST:
-    if (month, day) not in GENERAL_CALENDAR:
-        GENERAL_CALENDAR[(month, day)] = []
-    GENERAL_CALENDAR[(month, day)].append((title, rank))
-
 # Bad, but temporary
 MOVABLE_CALENDAR_STR = {
     "saint_family": [(u"Santa Famiglia di Gesù, Maria e Giuseppe", TYPE_LORD_FEAST)],
@@ -248,17 +242,6 @@ MOVABLE_CALENDAR_STR = {
     "pentecost + datetime.timedelta(days=19)": [(u"Sacratissimo Cuore di Gesù", TYPE_SOLEMNITY)],
     "pentecost + datetime.timedelta(days=20)": [(u"Cuore Immacolato della beata Vergine Maria", TYPE_MEMORY)],
     }
-
-def compute_movable_calendar(year):
-    saint_family = get_saint_family(year)
-    pentecost = get_pentecost(year)
-
-    movable_calendar = {}
-    for calc_func, data in MOVABLE_CALENDAR_STR.iteritems():
-        # TODO - Unsecure, but temporary
-        movable_calendar[eval(calc_func)] = data
-
-    return movable_calendar
 
 def populate_base_competitors(session):
     import database
