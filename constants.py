@@ -50,24 +50,3 @@ TYPE_TO_PRIORITY = {
     TYPE_MEMORY: PRI_MEMORIES,
     TYPE_OPTIONAL_MEMORY: PRI_UNCHOSEN_OPT_MEM,
 }
-
-WEEKDAYS_ITALIAN = {
-    WD_MONDAY: u'lunedì',
-    WD_TUESDAY: u'martedì',
-    WD_WEDNESDAY: u'mercoledì',
-    WD_THURSDAY: u'giovedì',
-    WD_FRIDAY: u'venerdì',
-    WD_SATURDAY: u'sabato',
-    WD_SUNDAY: u'domenica',
-}
-
-SEASONS_ITALIAN = {
-    SEASON_ADVENT: 'tempo di avvento',
-    SEASON_CHRISTMAS: 'tempo di Natale',
-    SEASON_ORDINARY_I: 'tempo ordinario',
-    SEASON_LENT: 'tempo di quaresima',
-    SEASON_EASTER: 'tempo di Pasqua',
-    SEASON_ORDINARY_II: 'tempo ordinario',
-}
-
-BASE_TITLE_ITALIAN = '%s della %s settimana del %s'

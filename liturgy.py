@@ -158,7 +158,7 @@ def build_lit_year(year):
 def print_year(year):
     lit_year = build_lit_year(year)
     for ld in lit_year:
-        print u'%s (%s, anno: %d)%s' % (ld, WEEKDAYS_ITALIAN[ld.weekday()], ld.ref_year, ' *' if ld.slid else '')
+        print u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
         for comp in ld.competitors:
             print u'  %2d: %s' % (comp[0], comp[1].title)
         print
