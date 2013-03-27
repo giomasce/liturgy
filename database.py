@@ -64,10 +64,11 @@ class Reading(Base):
     id = Column(Integer, primary_key=True)
     order = Column(Integer, nullable=False) 
     mass_id = Column(Integer, ForeignKey(Mass.id), nullable=False)
+    title = Column(String, nullable=False)
     quote = Column(String, nullable=True)
     text = Column(String, nullable=True)
-    status = Column(String, nullable=False, default='unknown')
-    title = Column(String, nullable=False)
+    quote_status = Column(String, nullable=False)
+    text_status = Column(String, nullable=False)
 
     mass = relationship(Mass,
                         backref=backref('readings', order_by=order))
