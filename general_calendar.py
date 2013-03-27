@@ -194,7 +194,7 @@ GENERAL_CALENDAR_LIST = [
     (11, 1, u"Tutti i santi", TYPE_SOLEMNITY),
     # Techincally "commemorazione" is not a solemnity, but it is
     # granted the same priority level
-    (11, 2, u"Commemoriazione di tutti i fedeli defunti", TYPE_SOLEMNITY),
+    #(11, 2, u"Commemoriazione di tutti i fedeli defunti", TYPE_SOLEMNITY),
     (11, 3, u"S. Martino de Porres, religioso", TYPE_OPTIONAL_MEMORY),
     (11, 4, u"S. Carlo Borromeo, vescovo", TYPE_MEMORY),
     (11, 9, u"Dedicazione della Basilica Lateranense", TYPE_FEAST),
@@ -449,7 +449,6 @@ def populate_database():
         fe.month = month
         fe.type = type_
         fe.title = title
-        #fe.priority = TYPE_TO_PRIORITY[type_]
         session.add(fe)
 
     for calc_func, data in MOVABLE_CALENDAR_STR.iteritems():
@@ -460,6 +459,14 @@ def populate_database():
         session.add(me)
 
     populate_base_competitors(session)
+
+    # An exception
+    fe = database.FixedEvent()
+    fe.day = 2
+    fe.month = 11
+    fe.priority = PRI_SOLEMNITIES
+    fe.title = u'Commemorazione di tutti i fedeli defunti'
+    session.add(fe)
 
     session.commit()
 
