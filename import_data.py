@@ -57,9 +57,11 @@ def main():
                       u'Salmo responsoriale',
                       u'Sesta lettura',
                       u'Salmo responsoriale',
-                      u'Epistola lettura',
+                      u'Settima lettura',
                       u'Salmo responsoriale',
-                      u'Vangelo lettura']
+                      u'Epistola',
+                      u'Salmo responsoriale',
+                      u'Vangelo']
         else:
             raise Exception('Strange number of readings (%d)' % (len(quotes)))
         for (text, quote), title in zip(quotes, titles):
