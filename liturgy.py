@@ -45,11 +45,14 @@ def get_season_beginning(ref_year, season):
 
     return (first_day, ref_sunday, week_num)
 
+def calc_ref_year(date):
+    return date.year if date < get_advent_first(date.year + 1) else date.year + 1
+
 class LitDate(datetime.date):
 
     def __init__(self, year, month, day):
         datetime.date.__init__(self, year, month, day)
-        self.ref_year = year if self < get_advent_first(year + 1) else year + 1
+        self.ref_year = calc_ref_year(self)
         self.digit = DIGIT_MAP[self.ref_year % 2]
         self.letter = LETTER_MAP[self.ref_year % 3]
         self.season, self.week = self.get_season()
@@ -65,6 +68,9 @@ class LitDate(datetime.date):
         ld = LitDate(date.year, date.month, date.day)
         ld.provide_movable_calendar(movable_calendar, session)
         return ld
+
+    def to_date(self):
+        return datetime.date(self.year, self.month, self.day)
 
     def get_season(self):
         for season in xrange(SEASON_NUM - 1, -1, -1):
@@ -108,6 +114,10 @@ class LitDate(datetime.date):
         res += self._get_movable_competitors(movable_calendar)
         return sorted(res, key=lambda x: x[0])
 
+    def get_winner(self):
+        assert len(self.competitors) == 1 or self.competitors[0][0] != self.competitors[1][0]
+        return self.competitors[0]
+
 def compute_movable_calendar(year, session):
     movable_calendar = {}
     for event in session.query(MovableEvent):
@@ -125,8 +135,7 @@ def compute_movable_calendar(year, session):
 
     return movable_calendar
 
-def build_lit_year(year):
-    session = Session()
+def build_lit_year(year, session):
     movable_calendar = compute_movable_calendar(year, session)
     lit_year = [LitDate.from_date(date, movable_calendar, session) for date in iterlityeardates(year)]
     session.close()
@@ -155,13 +164,18 @@ def build_lit_year(year):
 
     return lit_year
 
+def build_dict_lit_year(year, session):
+    return dict([(lit_date.to_date(), lit_date) for lit_date in build_lit_year(year, session)])
+
 def print_year(year):
-    lit_year = build_lit_year(year)
+    session = Session()
+    lit_year = build_lit_year(year, session)
     for ld in lit_year:
         print u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
         for comp in ld.competitors:
             print u'  %2d: %s' % (comp[0], comp[1].title)
         print
+    session.close()
 
 def test_years():
     for year in range(1900, 2100):

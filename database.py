@@ -62,7 +62,8 @@ class Reading(Base):
     __tablename__ = 'readings'
 
     id = Column(Integer, primary_key=True)
-    order = Column(Integer, nullable=False) 
+    order = Column(Integer, nullable=False)
+    alt_num = Column(Integer, nullable=False)
     mass_id = Column(Integer, ForeignKey(Mass.id), nullable=False)
     title = Column(String, nullable=False)
     quote = Column(String, nullable=True)
