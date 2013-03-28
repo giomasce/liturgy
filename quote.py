@@ -218,10 +218,48 @@ def canonical_quote(quote):
 
     quote = quote.replace(' ', '')
     return "%s %s" % (book, quote)
-    
+
+class BibleQuery:
+
+    def __init__(self, db_filename=None):
+        from pysqlite2 import dbapi2 as sqlite
+        if db_filename is None:
+            db_filename = 'bible.sqlite'
+        self.conn = sqlite.connect(db_filename)
+        self.cur = self.conn.cursor()
+
+    def get_text(self, verses):
+        # TODO - This method isn't protected from SQL injection
+        if verses is None:
+            return None
+
+        conds = []
+
+        for first, second in verses:
+            assert(first[0] == second[0])
+            first_cond = 'capitolo > %s OR (capitolo = %s AND versetto >= %d)' % (first[1], first[1], my_int(first[2]))
+            second_cond = 'capitolo < %s OR (capitolo = %s AND versetto <= %d)' % (second[1], second[1], my_int(second[2]))
+            cond = "libro = '%s' AND (%s) AND (%s)" % (first[0], first_cond, second_cond)
+            conds.append(cond)
+
+        query = 'SELECT testo FROM bibbia WHERE %s ORDER BY indice ASC;' % (' OR '.join(map(lambda x: '(%s)' % x, conds)))
+
+        self.cur.execute(query)
+        text = u''
+        for row in self.cur:
+            text = text + unicode(row[0]) + u' '
+
+        text = text.replace(u'//', u'\n\n')
+        text = text.replace(u'/', u'\n\n')
+        text = text.replace(u'\u2019', u'\'')
+
+        return text
 
 def test_quote(quote):
-    print "%30s: %30s --> %r" % (quote, canonical_quote(quote), decode_quote(quote))
+    bq = BibleQuery()
+    verses = decode_quote(quote)
+    print "%30s: %30s --> %r" % (quote, canonical_quote(quote), verses)
+    #print "  %s" % (bq.get_text(verses))
 
 if __name__ == '__main__':
     test_quote('1Gv 5,5b-13a')
