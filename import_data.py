@@ -36,13 +36,39 @@ def main():
         session.add(mass)
 
         order = 0
-        for text, quote in quotes:
+        if len(quotes) == 4:
+            titles = [u'Prima lettura', u'Salmo responsoriale', u'Seconda lettura', u'Vangelo']
+        elif len(quotes) == 3:
+            titles = [u'Prima lettura', u'Salmo responsoriale', u'Vangelo']
+        # Domenica delle Palme
+        elif len(quotes) == 5:
+            titles = [u'Vangelo delle Palme', u'Prima lettura', u'Salmo responsoriale', u'Seconda lettura', u'Vangelo']
+        # Pasqua
+        elif len(quotes) == 17:
+            titles = [u'Prima lettura',
+                      u'Salmo responsoriale',
+                      u'Seconda lettura',
+                      u'Salmo responsoriale',
+                      u'Terza lettura',
+                      u'Salmo responsoriale',
+                      u'Quarta lettura',
+                      u'Salmo responsoriale',
+                      u'Quinta lettura',
+                      u'Salmo responsoriale',
+                      u'Sesta lettura',
+                      u'Salmo responsoriale',
+                      u'Epistola lettura',
+                      u'Salmo responsoriale',
+                      u'Vangelo lettura']
+        else:
+            raise Exception('Strange number of readings (%d)' % (len(quotes)))
+        for (text, quote), title in zip(quotes, titles):
             reading = Reading()
             reading.order = order
             order += 1
             reading.alt_num = 0
             reading.mass = mass
-            reading.title = u''
+            reading.title = title
             reading.quote = quote
             reading.text = text
             reading.quote_status = 'auto'
