@@ -64,6 +64,11 @@ def main():
                       u'Vangelo']
         else:
             raise Exception('Strange number of readings (%d)' % (len(quotes)))
+
+        # Check quotes
+        for text, quote in quotes:
+            decode_quote(quote, allow_only_chap=True)
+
         for (text, quote), title in zip(quotes, titles):
             reading = Reading()
             reading.order = order
@@ -81,11 +86,11 @@ def main():
             session.add(reading)
 
         # Write some interesting things
-        print "%s:" % (date)
-        print "  Indications: %s" % (piece['indications'])
-        print "  Winner: %s" % (event.title)
-        print "  Quotes: %s" % (quotes)
-        print
+        # print "%s:" % (date)
+        # print "  Indications: %s" % (piece['indications'])
+        # print "  Winner: %s" % (event.title)
+        # print "  Quotes: %s" % (quotes)
+        # print
 
     session.commit()
     session.close()
