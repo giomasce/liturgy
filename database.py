@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
@@ -24,7 +24,7 @@ class FixedEvent(Event):
     __tablename__ = 'fixed_events'
     __mapper_args__ = {'polymorphic_identity': 'fixed'}
 
-    id = Column(Integer, ForeignKey(Event.id), primary_key=True)
+    id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     day = Column(Integer, nullable=False)
     month = Column(Integer, nullable=False)
     season = Column(Integer, nullable=True)
@@ -33,7 +33,7 @@ class TimedEvent(Event):
     __tablename__ = 'timed_events'
     __mapper_args__ = {'polymorphic_identity': 'timed'}
 
-    id = Column(Integer, ForeignKey(Event.id), primary_key=True)
+    id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     weekday = Column(Integer, nullable=False)
     week = Column(Integer, nullable=False)
     season = Column(Integer, nullable=False)
@@ -42,15 +42,18 @@ class MovableEvent(Event):
     __tablename__ = 'movable_events'
     __mapper_args__ = {'polymorphic_identity': 'movable'}
 
-    id = Column(Integer, ForeignKey(Event.id), primary_key=True)
+    id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     calc_func = Column(String, nullable=False)
 
 class Mass(Base):
     __tablename__ = 'masses'
+    __table_args__ = (
+        UniqueConstraint("event_id", "order", "digit", "letter"),
+        )
 
     id = Column(Integer, primary_key=True)
+    event_id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     order = Column(Integer, nullable=False)
-    event_id = Column(Integer, ForeignKey(Event.id), nullable=False)
     digit = Column(String, nullable=True)
     letter = Column(Integer, nullable=True)
     title = Column(String, nullable=True)
@@ -60,13 +63,16 @@ class Mass(Base):
 
 class Reading(Base):
     __tablename__ = 'readings'
+    __table_args__ = (
+        UniqueConstraint("mass_id", "order", "alt_num"),
+        )
 
     id = Column(Integer, primary_key=True)
+    mass_id = Column(Integer, ForeignKey(Mass.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     order = Column(Integer, nullable=False)
     alt_num = Column(Integer, nullable=False)
-    mass_id = Column(Integer, ForeignKey(Mass.id), nullable=False)
     title = Column(String, nullable=False)
-    quote = Column(String, nullable=True)
+    quote = Column(String, nullable=True, index=True)
     text = Column(String, nullable=True)
     quote_status = Column(String, nullable=False)
     text_status = Column(String, nullable=False)
