@@ -24,7 +24,8 @@ def main():
         date = piece['date']
         lit_date = get_lit_date(date, lit_years, session)
         event = lit_date.get_winner()[1]
-        quotes = map(canonical_quote, piece['quotes'] + [piece['quote_vangelo']])
+        quotes = map(lambda x: [None, canonical_quote(x)], piece['quotes'] + [piece['quote_vangelo']])
+        quotes[-1][0] = piece['text_vangelo']
 
         mass = Mass()
         mass.order = 0
@@ -35,7 +36,7 @@ def main():
         session.add(mass)
 
         order = 0
-        for quote in quotes:
+        for text, quote in quotes:
             reading = Reading()
             reading.order = order
             order += 1
@@ -43,9 +44,12 @@ def main():
             reading.mass = mass
             reading.title = u''
             reading.quote = quote
-            reading.text = None
+            reading.text = text
             reading.quote_status = 'auto'
-            reading.text_status = 'missing'
+            if text is None:
+                reading.text_status = 'missing'
+            else:
+                reading.text_status = 'auto'
             session.add(reading)
 
         # Write some interesting things
@@ -55,7 +59,7 @@ def main():
         print "  Quotes: %s" % (quotes)
         print
 
-    session.rollback()
+    session.commit()
     session.close()
 
 if __name__ == '__main__':
