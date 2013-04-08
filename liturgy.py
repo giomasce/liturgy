@@ -160,7 +160,8 @@ def build_lit_year(year, session):
 
     # Check that in every date there is exactly one winner
     for lit_date in lit_year:
-        assert len(lit_date.competitors) == 1 or lit_date.competitors[0][0] != lit_date.competitors[1][0]
+        if not (len(lit_date.competitors) == 1 or lit_date.competitors[0][0] != lit_date.competitors[1][0]):
+            print >> sys.stderr, "WARNING! Winner is not unique on day %s" % (lit_date)
 
     return lit_year
 
