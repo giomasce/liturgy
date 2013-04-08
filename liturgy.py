@@ -167,14 +167,24 @@ def build_lit_year(year, session):
 def build_dict_lit_year(year, session):
     return dict([(lit_date.to_date(), lit_date) for lit_date in build_lit_year(year, session)])
 
+def print_lit_date(ld):
+    print u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
+    for comp in ld.competitors:
+        print u'  %2d: %s' % (comp[0], comp[1].title)
+    print
+
 def print_year(year):
     session = Session()
     lit_year = build_lit_year(year, session)
     for ld in lit_year:
-        print u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
-        for comp in ld.competitors:
-            print u'  %2d: %s' % (comp[0], comp[1].title)
-        print
+        print_lit_date(ld)
+    session.close()
+
+def print_date(date):
+    session = Session()
+    ref_year = calc_ref_year(date)
+    lit_year = build_dict_lit_year(ref_year, session)
+    print_lit_date(lit_year[date])
     session.close()
 
 def test_years():
@@ -185,5 +195,11 @@ if __name__ == '__main__':
     import locale
     import codecs
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-    print_year(int(sys.argv[1]))
+
+    if len(sys.argv) == 1:
+        print_year(calc_ref_year(datetime.date.today()))
+    elif len(sys.argv) == 2:
+        print_year(int(sys.argv[1]))
+    elif len(sys.argv) == 4:
+        print_date(datetime.date(int(sys.argv[3]), int(sys.argv[2]), int(sys.argv[1])))
     #test_years()
