@@ -101,6 +101,8 @@ def scrape_file(fhtml):
         if text is not None:
             for tag, value in text_substs:
                 text = text.replace(tag, value)
+            # Strip extremal whitespaces, leaving only a newline at the end
+            text = text.strip() + "\n"
         res[i] = quote, text
 
     return res
