@@ -18,17 +18,20 @@ def main():
     temp.close()
 
     os.system("emacs -nw %s" % (tempname))
-
-    sys.stdout.write("Confirm changes? [y/N] ")
-    answer = sys.stdin.readline().strip()
-    if answer == 'y' or answer == 'Y':
-        sys.stdout.write("Changes confirmed\n")
-        with open(tempname) as fin:
-            reading.text = fin.read().decode('utf-8')
-        session.commit()
+    with open(tempname) as fin:
+        new_text = fin.read().decode('utf-8')
+    if new_text == reading.text:
+        sys.stdout.write("Text wasn't modified, ignoring...\n")
     else:
-        sys.stdout.write("Changes rejected\n")
-        session.rollback()
+        sys.stdout.write("Confirm changes? [y/N] ")
+        answer = sys.stdin.readline().strip()
+        if answer == 'y' or answer == 'Y':
+            sys.stdout.write("Changes confirmed\n")
+            reading.text = new_text
+            session.commit()
+        else:
+            sys.stdout.write("Changes rejected\n")
+            session.rollback()
 
     try:
         os.unlink(tempname)
