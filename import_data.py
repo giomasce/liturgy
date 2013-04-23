@@ -4,6 +4,8 @@
 import sys
 import os
 import cPickle as pickle
+import yaml
+import json
 
 from liturgy import calc_ref_year, build_dict_lit_year
 from database import Session, Mass, Reading
@@ -33,6 +35,7 @@ def main():
         mass.digit = lit_date.digit
         mass.letter = lit_date.letter
         mass.title = None
+        mass.status = 'auto'
         session.add(mass)
 
         order = 0
@@ -85,14 +88,17 @@ def main():
                 reading.text_status = 'auto'
             session.add(reading)
 
-        # Write some interesting things
-        # print "%s:" % (date)
-        # print "  Indications: %s" % (piece['indications'])
-        # print "  Winner: %s" % (event.title)
-        # print "  Quotes: %s" % (quotes)
-        # print
+        session.flush()
 
-    session.commit()
+        # Write some interesting things
+        print "#%s:" % (date)
+        print "#  Indications: %s" % (piece['indications'])
+        print "#  Winner: %s" % (event.title)
+        print
+        print json.dumps(event.as_dict(), encoding='utf-8', ensure_ascii=False, indent=2, sort_keys=True)
+        print
+
+    #session.commit()
     session.close()
 
 if __name__ == '__main__':
