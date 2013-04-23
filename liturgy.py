@@ -115,7 +115,8 @@ class LitDate(datetime.date):
         return sorted(res, key=lambda x: x[0])
 
     def get_winner(self):
-        assert len(self.competitors) == 1 or self.competitors[0][0] != self.competitors[1][0]
+        if not(len(self.competitors) == 1 or self.competitors[0][0] != self.competitors[1][0]):
+            return None
         return self.competitors[0]
 
 def compute_movable_calendar(year, session):

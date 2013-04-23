@@ -40,7 +40,7 @@ def my_int(s):
     """
     return int(str(filter(lambda x: x.isdigit(), s)))
 
-def decode_quote(quote, allow_only_chap=False):
+def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
     """Decode a quote. An exception is casted if and only if the quote
     is (syntactically) invalid.
 
@@ -54,6 +54,13 @@ def decode_quote(quote, allow_only_chap=False):
 
     A verse value of '-1' indicates the last verse in the chapter.
 
+    If allow_only_chap is True, a quote without verses indication is
+    accepted, otherwise it isn't.
+
+    If valid_abbr is not None, it is interpreted as a list of all the
+    acceptable abbreviations for Bible books. The quote is checked to
+    employ one of these abbreviations.
+
     """
 
     if quote is None:
@@ -62,11 +69,14 @@ def decode_quote(quote, allow_only_chap=False):
     #print quote
 
     verses = []
-    quote = quote.strip()
+    quote = canonical_quote(quote)
     try:
         book, quote = quote.split(' ', 1)
     except ValueError:
         raise Exception("Could not split %s" % (quote))
+
+    if valid_abbr is not None and book not in valid_abbr:
+        raise Exception("Book %s not valid" % (book))
 
     quote = quote.replace(' ', '')
     shards = split_shards(quote)
@@ -210,14 +220,29 @@ def canonical_quote(quote):
     if quote is None:
         return None
 
-    quote = quote.strip()
-    try:
-        book, quote = quote.split(' ', 1)
-    except ValueError:
-        raise Exception("Could not split %s" % (quote))
+    quote = quote.strip().replace(' ', '')
 
-    quote = quote.replace(' ', '')
-    return "%s %s" % (book, quote)
+    # Add a space after the first letter-to-digit transition
+    for i in xrange(len(quote)-1):
+        if quote[i].isalpha() and quote[i+1].isdigit():
+            #quote[i:i] = ' '
+            quote = '%s %s' % (quote[:i+1], quote[i+1:])
+            break
+
+    return quote
+
+def convert_quote(quote, abbr_from, abbr_to):
+    """Convert a quote from an abbreviation convention to another. The
+    quote must be in canonical form.
+
+    """
+
+    if quote is None:
+        return None
+
+    book, verses = quote.split(' ', 1)
+    idx = abbr_from.index(book)
+    return abbr_to[idx]
 
 class BibleQuery:
 
@@ -263,6 +288,7 @@ def test_quote(quote):
 
 if __name__ == '__main__':
     test_quote('1Gv 5,5b-13a')
+    test_quote('1 Gv 5,5b-13a')
     test_quote('Lc 3, 15-16 . 21-22')
     test_quote('Mt 4, 12-17, 23   ')
     test_quote('Mt 4, 12-17, 23 ; 18,24.26-29c')
