@@ -35,9 +35,14 @@ def split_shards(s):
     return shards
 
 def my_int(s):
-    """Wrap int() into the removal of all non-digit characters.
+    """Wrap int() into the removal of all non-digit characters. The
+    input '-1' is treated specially: it just returns a very high
+    number, supposed to be greater than any verse number appearing in
+    the Bible.
 
     """
+    if s == '-1':
+        return 1000000
     return int(str(filter(lambda x: x.isdigit(), s)))
 
 def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
@@ -118,8 +123,8 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
                 if shard == ',':
                     state = 'verse'
                 elif allow_only_chap and shard == '/':
-                    verses.append(((book, chap, 1),
-                                   (book, chap, -1)))
+                    verses.append(((book, chap, '1'),
+                                   (book, chap, '-1')))
                     state = 'end'
                 elif allow_only_chap and shard == '-':
                     first_chap = chap
@@ -255,6 +260,7 @@ class BibleQuery:
 
     def get_text(self, verses):
         # TODO - This method isn't protected from SQL injection
+        # TODO - Add a mechanism to properly handle Psalms numbering
         if verses is None:
             return None
 

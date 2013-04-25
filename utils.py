@@ -7,6 +7,26 @@ from datetime import date
 
 from movable_dates import get_advent_first
 
+class PrependStream():
+
+    def __init__(self, back, prefix):
+        self.back = back
+        self.prefix = prefix
+        self.first = True
+
+    def write(self, s):
+        if s == '':
+            return
+        if self.first:
+            self.first = False
+            self.back.write(self.prefix)
+        if s[-1] == '\n':
+            s = s[:-1]
+            self.first = True
+        self.back.write(s.replace('\n', '\n' + self.prefix))
+        if self.first:
+            self.back.write('\n')
+
 def real_itermonthdays(year, month):
     for day in calendar.Calendar().itermonthdays(year, month):
         # Some days are returned to complete weeks; we ignore them

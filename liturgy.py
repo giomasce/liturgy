@@ -169,11 +169,13 @@ def build_lit_year(year, session):
 def build_dict_lit_year(year, session):
     return dict([(lit_date.to_date(), lit_date) for lit_date in build_lit_year(year, session)])
 
-def print_lit_date(ld):
-    print u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
+def print_lit_date(ld, outfile=None):
+    if outfile is None:
+        outfile = sys.stdout
+    print >> outfile, u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
     for comp in ld.competitors:
-        print u'  %2d: %s' % (comp[0], comp[1].title)
-    print
+        print >> outfile, u'  %2d: %s' % (comp[0], comp[1].title)
+    print >> outfile, ""
 
 def print_year(year):
     session = Session()

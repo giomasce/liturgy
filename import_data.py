@@ -8,11 +8,11 @@ import yaml
 import json
 import datetime
 
-from liturgy import calc_ref_year, build_dict_lit_year
+from liturgy import calc_ref_year, build_dict_lit_year, print_lit_date
 from database import Session, Mass, Reading
 from quote import canonical_quote, decode_quote
 from scrape import scrape_file
-from utils import real_itermonthdays
+from utils import real_itermonthdays, PrependStream
 from abbreviations import ABBR_VATICAN
 
 def get_lit_date(date, lit_years, session):
@@ -96,8 +96,8 @@ def import_from_scrape(year, month):
         session.flush()
 
         # Write some interesting things
-        print "#%s:" % (date)
-        print "#  Winner: %s" % (event.title)
+        print '#'
+        print_lit_date(lit_date, PrependStream(sys.stdout, '# '))
         print
         print json.dumps(event.as_dict(), encoding='utf-8', ensure_ascii=False, indent=2, sort_keys=True)
         print
