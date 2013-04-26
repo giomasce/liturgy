@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from psalms import masoretic_to_septuagint, septuagint_to_masoretic
+from abbreviations import PSALMS_ABBR
+
 def split_shards(s):
     if s is None:
         return None
@@ -55,7 +58,8 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
     (extrema are to be included). Each element of such tuple is
     another tuple of strings in the form (book, chapter, verse). No
     attempt to decode book names or characters in chapters and verses
-    is performed.
+    is performed. No attempt to check monotonicity of numbers is
+    performed.
 
     A verse value of '-1' indicates the last verse in the chapter.
 
@@ -236,7 +240,7 @@ def canonical_quote(quote):
 
     return quote
 
-def convert_quote(quote, abbr_from, abbr_to):
+def convert_quote_abbreviation(quote, abbr_from, abbr_to):
     """Convert a quote from an abbreviation convention to another. The
     quote must be in canonical form.
 
@@ -248,6 +252,51 @@ def convert_quote(quote, abbr_from, abbr_to):
     book, verses = quote.split(' ', 1)
     idx = abbr_from.index(book)
     return abbr_to[idx]
+
+def convert_quote_psalm_numbering(quote, to_septuagint):
+    """Convert a quote from a Psalm numbering to the other. If the
+    quote is not from Psalms, it is returned untouched. It is expected
+    that the quote is not too complicated (i.e., a single chapter with
+    verses or a chapters interval). If there is a verses specification
+    and the quote is mangled, the verses specification is lost.
+
+    If the method is not able to perform the conversion, the untouched
+    quoted is silently returned. No exceptions are casted. Thus, this
+    method is appropriately used only in contexts in which it is
+    possible to fail.
+
+    """
+    book, verses = quote.split(' ', 1)
+    if book != PSALMS_ABBR:
+        return quote
+
+    # Warning: you're entering a wild-guessing and highly heuristic
+    # area
+    try:
+        if ',' in verses:
+            num, _ = int(verses.split(',', 1))
+            chaps = num, num
+        else:
+            if '-' in verses:
+                chaps = map(int, verses.split('-', 1))
+            else:
+                num = int(verses)
+                chaps = num, num
+
+        if to_septuagint:
+            func = masoretic_to_septuagint
+        else:
+            func = septuagint_to_masoretic
+
+        new_chaps = map(func, chaps)
+        new_chaps = new_chaps[0][0], new_chaps[1][1]
+        if new_chaps[0] == new_chaps[1]:
+            return u"%s %d" % (PSALMS_ABBR, new_chaps[0])
+        else:
+            return u"%s %d-%d" % (PSALMS_ABBR, new_chaps[0], new_chaps[1])
+
+    except:
+        return quote
 
 class BibleQuery:
 

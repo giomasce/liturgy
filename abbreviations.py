@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# It is hoped that Psalms appear everywhere in the same abbreviated
+# from
+PSALMS_ABBR = u"Sal"
+
 BOOKS = [
     u"Genesi",
     u"Esodo",
