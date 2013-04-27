@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import os
-import tempfile
-import codecs
 
 from database import Session, Reading
 from quote import BibleQuery, decode_quote, convert_quote_psalm_numbering

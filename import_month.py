@@ -8,18 +8,12 @@ import yaml
 import json
 import datetime
 
-from liturgy import calc_ref_year, build_dict_lit_year, print_lit_date
+from liturgy import calc_ref_year, build_dict_lit_year, print_lit_date, get_lit_date
 from database import Session, Mass, Reading
 from quote import canonical_quote, decode_quote
 from scrape import scrape_file
 from utils import real_itermonthdays, PrependStream
 from abbreviations import ABBR_VATICAN
-
-def get_lit_date(date, lit_years, session):
-    ref_year = calc_ref_year(date)
-    if ref_year not in lit_years:
-        lit_years[ref_year] = build_dict_lit_year(ref_year, session)
-    return lit_years[ref_year][date]
 
 def import_from_scrape(year, month):
     lit_years = {}

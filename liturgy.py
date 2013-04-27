@@ -139,7 +139,6 @@ def compute_movable_calendar(year, session):
 def build_lit_year(year, session):
     movable_calendar = compute_movable_calendar(year, session)
     lit_year = [LitDate.from_date(date, movable_calendar, session) for date in iterlityeardates(year)]
-    session.close()
 
     # Compute sliding of solemnities
     queue = []
@@ -176,6 +175,12 @@ def print_lit_date(ld, outfile=None):
     for comp in ld.competitors:
         print >> outfile, u'  %2d: %s' % (comp[0], comp[1].title)
     print >> outfile, ""
+
+def get_lit_date(date, lit_years, session):
+    ref_year = calc_ref_year(date)
+    if ref_year not in lit_years:
+        lit_years[ref_year] = build_dict_lit_year(ref_year, session)
+    return lit_years[ref_year][date]
 
 def print_year(year):
     session = Session()
