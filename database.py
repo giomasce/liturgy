@@ -29,10 +29,11 @@ class Event(Base):
     type = Column(Integer, nullable=True)
     priority = Column(Integer, nullable=True)
     title = Column(Unicode, nullable=False)
+    status = Column(Unicode, nullable=False)
 
     __mapper_args__ = {'polymorphic_on': class_type}
 
-    __fields__ = ['title']
+    __fields__ = ['title', 'status']
     __dict_fields__ = ['masses']
 
 class FixedEvent(Event):

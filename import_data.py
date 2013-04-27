@@ -33,13 +33,16 @@ def import_from_scrape(year, month):
         with open(os.path.join('scrape', '%04d-%02d-%02d.html' % (year, month, day))) as fhtml:
             quotes = scrape_file(fhtml)
 
+        if u'auto' not in event.status.split(u' '):
+            event.status += u' auto'
+
         mass = Mass()
         mass.order = 0
         mass.event = event
         mass.digit = lit_date.digit
         mass.letter = lit_date.letter
         mass.title = None
-        mass.status = 'auto'
+        mass.status = u'auto'
         session.add(mass)
 
         order = 0
@@ -84,23 +87,23 @@ def import_from_scrape(year, month):
             try:
                 decode_quote(quote, allow_only_chap=True, valid_abbr=ABBR_VATICAN)
             except:
-                reading.quote_status = 'auto (invalid)'
+                reading.quote_status = u'auto invalid'
             else:
-                reading.quote_status = 'auto'
+                reading.quote_status = u'auto'
             if text is None:
-                reading.text_status = 'missing'
+                reading.text_status = u'missing'
             else:
-                reading.text_status = 'auto'
+                reading.text_status = u'auto'
             session.add(reading)
 
         session.flush()
 
         # Write some interesting things
-        print '#'
-        print_lit_date(lit_date, PrependStream(sys.stdout, '# '))
-        print
-        print json.dumps(event.as_dict(), encoding='utf-8', ensure_ascii=False, indent=2, sort_keys=True)
-        print
+        #print '#'
+        #print_lit_date(lit_date, PrependStream(sys.stdout, '# '))
+        #print
+        #print json.dumps(event.as_dict(), encoding='utf-8', ensure_ascii=False, indent=2, sort_keys=True)
+        #print
 
     session.commit()
     session.close()
@@ -123,7 +126,7 @@ def import_from_pickle():
         mass.digit = lit_date.digit
         mass.letter = lit_date.letter
         mass.title = None
-        mass.status = 'auto'
+        mass.status = u'auto'
         session.add(mass)
 
         order = 0
@@ -168,13 +171,13 @@ def import_from_pickle():
             try:
                 decode_quote(quote, allow_only_chap=True, valid_abbr=ABBR_VATICAN)
             except:
-                reading.quote_status = 'auto (invalid)'
+                reading.quote_status = u'auto (invalid)'
             else:
-                reading.quote_status = 'auto'
+                reading.quote_status = u'auto'
             if text is None:
-                reading.text_status = 'missing'
+                reading.text_status = u'missing'
             else:
-                reading.text_status = 'auto'
+                reading.text_status = u'auto'
             session.add(reading)
 
         session.flush()

@@ -18,15 +18,15 @@ WEEKDAYS_ITALIAN = {
 }
 
 SEASONS_ITALIAN = {
-    SEASON_ADVENT: 'tempo di avvento',
-    SEASON_CHRISTMAS: 'tempo di Natale',
-    SEASON_ORDINARY_I: 'tempo ordinario',
-    SEASON_LENT: 'tempo di quaresima',
-    SEASON_EASTER: 'tempo di Pasqua',
+    SEASON_ADVENT: u'tempo di avvento',
+    SEASON_CHRISTMAS: u'tempo di Natale',
+    SEASON_ORDINARY_I: u'tempo ordinario',
+    SEASON_LENT: u'tempo di quaresima',
+    SEASON_EASTER: u'tempo di Pasqua',
     SEASON_ORDINARY_II: 'tempo ordinario',
 }
 
-BASE_TITLE_ITALIAN = '%s della %s settimana del %s'
+BASE_TITLE_ITALIAN = u'%s della %s settimana del %s'
 
 GENERAL_CALENDAR_LIST = [
     (1, 1, u"Maria SS. Madre di Dio", TYPE_SOLEMNITY),
@@ -257,11 +257,11 @@ GENERAL_CALENDAR_LIST = [
 
 # Bad, but temporary
 MOVABLE_CALENDAR_STR = {
-    "saint_family": [(u"Santa Famiglia di Gesù, Maria e Giuseppe", TYPE_LORD_FEAST)],
-    "pentecost + datetime.timedelta(days=7)": [(u"SS. Trinità", TYPE_SOLEMNITY)],
-    "pentecost + datetime.timedelta(days=14)": [(u"SS. Corpo e Sangue di Cristo", TYPE_SOLEMNITY)],
-    "pentecost + datetime.timedelta(days=19)": [(u"Sacratissimo Cuore di Gesù", TYPE_SOLEMNITY)],
-    "pentecost + datetime.timedelta(days=20)": [(u"Cuore Immacolato della beata Vergine Maria", TYPE_MEMORY)],
+    u"saint_family": [(u"Santa Famiglia di Gesù, Maria e Giuseppe", TYPE_LORD_FEAST)],
+    u"pentecost + datetime.timedelta(days=7)": [(u"SS. Trinità", TYPE_SOLEMNITY)],
+    u"pentecost + datetime.timedelta(days=14)": [(u"SS. Corpo e Sangue di Cristo", TYPE_SOLEMNITY)],
+    u"pentecost + datetime.timedelta(days=19)": [(u"Sacratissimo Cuore di Gesù", TYPE_SOLEMNITY)],
+    u"pentecost + datetime.timedelta(days=20)": [(u"Cuore Immacolato della beata Vergine Maria", TYPE_MEMORY)],
     }
 
 def populate_base_competitors(session):
@@ -283,6 +283,7 @@ def populate_base_competitors(session):
                                       int_to_roman(week),
                                       SEASONS_ITALIAN[SEASON_ADVENT])
         te = database.TimedEvent()
+        te.status = u'incomplete'
         te.week = week
         te.weekday = weekday
         te.season = SEASON_ADVENT
@@ -292,6 +293,7 @@ def populate_base_competitors(session):
 
     for day in xrange(17, 25):
         fe = database.FixedEvent()
+        fe.status = u'incomplete'
         fe.day = day
         fe.month = 12
         fe.title = u'%d dicembre' % (day)
@@ -300,6 +302,7 @@ def populate_base_competitors(session):
 
     # Christmas
     fe = database.FixedEvent()
+    fe.status = u'incomplete'
     fe.day = 25
     fe.month = 12
     fe.title = u'Natale del Signore'
@@ -309,6 +312,7 @@ def populate_base_competitors(session):
     # Octave after Christmas
     for day in xrange(29, 32):
         fe = database.FixedEvent()
+        fe.status = u'incomplete'
         fe.day = day
         fe.month = 12
         fe.title = u'%d dicembre' % (day)
@@ -317,6 +321,7 @@ def populate_base_competitors(session):
 
     # Sunday after Christmas
     te = database.TimedEvent()
+    te.status = u'incomplete'
     te.week = 2
     te.weekday = WD_SUNDAY
     te.season = SEASON_CHRISTMAS
@@ -326,6 +331,7 @@ def populate_base_competitors(session):
     # Weekdays in January
     for day in range(2, 6) + range(7, 13):
         fe = database.FixedEvent()
+        fe.status = u'incomplete'
         fe.day = day
         fe.month = 1
         fe.season = SEASON_CHRISTMAS
@@ -335,6 +341,7 @@ def populate_base_competitors(session):
 
     # Epiphany
     fe = database.FixedEvent()
+    fe.status = u'incomplete'
     fe.day = 6
     fe.month = 1
     fe.title = u'Epifania del Signore'
@@ -343,6 +350,7 @@ def populate_base_competitors(session):
 
     # Baptism
     me = database.MovableEvent()
+    me.status = u'incomplete'
     me.calc_func = 'baptism'
     me.priority = PRI_SUNDAYS
     me.title = u'Battesimo del Signore'
@@ -360,6 +368,7 @@ def populate_base_competitors(session):
             if (week, weekday) == (34, WD_SUNDAY):
                 title = u"Nostro Signore Gesù Cristo Re dell'Universo"
             te = database.TimedEvent()
+            te.status = u'incomplete'
             te.week = week
             te.weekday = weekday
             te.season = SEASON_ORDINARY
@@ -370,6 +379,7 @@ def populate_base_competitors(session):
     # Ash day and following ones
     for weekday in [WD_WEDNESDAY, WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
         te = database.TimedEvent()
+        te.status = u'incomplete'
         te.season = SEASON_LENT
         te.week = 0
         te.weekday = weekday
@@ -385,6 +395,7 @@ def populate_base_competitors(session):
                                           int_to_roman(week),
                                           SEASONS_ITALIAN[SEASON_LENT])
             te = database.TimedEvent()
+            te.status = u'incomplete'
             te.week = week
             te.weekday = weekday
             te.season = SEASON_LENT
@@ -397,6 +408,7 @@ def populate_base_competitors(session):
                     WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
         title = u'Domenica delle Palme' if weekday == WD_SUNDAY else u'%s Santo' % (WEEKDAYS_ITALIAN[weekday].capitalize())
         te = database.TimedEvent()
+        te.status = u'incomplete'
         te.week = 6
         te.weekday = weekday
         te.season = SEASON_LENT
@@ -409,6 +421,7 @@ def populate_base_competitors(session):
                     WD_THURSDAY, WD_FRIDAY, WD_SATURDAY]:
         title = u'Pasqua di Resurrezione' if weekday == WD_SUNDAY else u"%s fra l'ottava di Pasqua" % (WEEKDAYS_ITALIAN[weekday])
         te = database.TimedEvent()
+        te.status = u'incomplete'
         te.week = 1
         te.weekday = weekday
         te.season = SEASON_EASTER
@@ -426,6 +439,7 @@ def populate_base_competitors(session):
             if (week, weekday) == (7, WD_SUNDAY):
                 title = u'Ascensione del Signore'
             te = database.TimedEvent()
+            te.status = u'incomplete'
             te.week = week
             te.weekday = weekday
             te.season = SEASON_EASTER
@@ -435,6 +449,7 @@ def populate_base_competitors(session):
 
     # Pentecost
     te = database.TimedEvent()
+    te.status = u'incomplete'
     te.week = 8
     te.weekday = WD_SUNDAY
     te.season = SEASON_EASTER
@@ -449,6 +464,7 @@ def populate_database():
 
     for month, day, title, type_ in GENERAL_CALENDAR_LIST:
         fe = database.FixedEvent()
+        fe.status = u'incomplete'
         fe.day = day
         fe.month = month
         fe.type = type_
@@ -457,6 +473,7 @@ def populate_database():
 
     for calc_func, data in MOVABLE_CALENDAR_STR.iteritems():
         me = database.MovableEvent()
+        me.status = u'incomplete'
         me.type = data[0][1]
         me.title = data[0][0]
         me.calc_func = calc_func
@@ -466,6 +483,7 @@ def populate_database():
 
     # An exception
     fe = database.FixedEvent()
+    fe.status = u'incomplete'
     fe.day = 2
     fe.month = 11
     fe.priority = PRI_SOLEMNITIES
