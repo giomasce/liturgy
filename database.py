@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import create_engine, Column, Integer, String, Unicode, UnicodeText, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
@@ -28,7 +28,7 @@ class Event(Base):
     class_type = Column(String, nullable=False)
     type = Column(Integer, nullable=True)
     priority = Column(Integer, nullable=True)
-    title = Column(String, nullable=False)
+    title = Column(Unicode, nullable=False)
 
     __mapper_args__ = {'polymorphic_on': class_type}
 
@@ -58,7 +58,7 @@ class MovableEvent(Event):
     __mapper_args__ = {'polymorphic_identity': 'movable'}
 
     id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-    calc_func = Column(String, nullable=False)
+    calc_func = Column(Unicode, nullable=False)
 
 class Mass(Base):
     __tablename__ = 'masses'
@@ -71,8 +71,8 @@ class Mass(Base):
     order = Column(Integer, nullable=False)
     digit = Column(String, nullable=True)
     letter = Column(Integer, nullable=True)
-    title = Column(String, nullable=True)
-    status = Column(String, nullable=False)
+    title = Column(Unicode, nullable=True)
+    status = Column(Unicode, nullable=False)
 
     event = relationship(Event,
                          backref=backref('masses', order_by=order))
@@ -90,11 +90,11 @@ class Reading(Base):
     mass_id = Column(Integer, ForeignKey(Mass.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     order = Column(Integer, nullable=False)
     alt_num = Column(Integer, nullable=False)
-    title = Column(String, nullable=False)
-    quote = Column(String, nullable=True, index=True)
-    text = Column(String, nullable=True)
-    quote_status = Column(String, nullable=False)
-    text_status = Column(String, nullable=False)
+    title = Column(Unicode, nullable=False)
+    quote = Column(Unicode, nullable=True, index=True)
+    text = Column(UnicodeText, nullable=True)
+    quote_status = Column(Unicode, nullable=False)
+    text_status = Column(Unicode, nullable=False)
 
     __fields__ = ['order', 'alt_num', 'title', 'quote', 'text',
                   'quote_status', 'text_status']
