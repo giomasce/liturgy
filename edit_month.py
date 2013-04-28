@@ -28,7 +28,7 @@ def edit_month(year, month):
         date = datetime.date(year, month, day)
         lit_date = get_lit_date(date, lit_years, session)
         event = lit_date.get_winner()[1]
-        print_lit_date(lit_date, PrependStream(editor.tempfile, u'# '))
+        print_lit_date(lit_date, PrependStream(editor.tempfile, u'# '), with_id=True)
         editor.tempfile.write(u'\n')
         editor.tempfile.write(json.dumps(event.as_dict(), ensure_ascii=False, indent=2, sort_keys=True) + u'\n')
         editor.tempfile.write(u'\n')
