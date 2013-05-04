@@ -13,7 +13,7 @@ from quote import BibleQuery, decode_quote, convert_quote_psalm_numbering
 from utils import PrependStream, real_itermonthdays
 from editor import Editor
 
-def edit_month(year, month):
+def edit_month(year, month, single_day=None):
     session = Session()
     bible_query = BibleQuery()
     lit_years = {}
@@ -24,7 +24,7 @@ def edit_month(year, month):
     PrependStream(editor.tempfile, '# ').write(u'-*- comment-start: "#"; -*-\n')
     editor.tempfile.write(u'\n')
 
-    for day in real_itermonthdays(year, month):
+    def push_day(day):
         date = datetime.date(year, month, day)
         lit_date = get_lit_date(date, lit_years, session)
         events = map(lambda x: x[1], lit_date.competitors)
@@ -34,8 +34,16 @@ def edit_month(year, month):
         editor.tempfile.write(u'---===---\n')
         editor.tempfile.write(u'\n')
 
+    if single_day is not None:
+        push_day(single_day)
+    else:
+        for day in real_itermonthdays(year, month):
+            push_day(day)
+
     editor.edit()
 
+    # TODO - Capture exceptions and give the ability to re-edit
+    # content
     lines = filter(lambda x: not x.startswith(u'#'), editor.edited_content)
     buf = u''
     for line in lines:
@@ -56,5 +64,4 @@ def edit_month(year, month):
         session.rollback()
 
 if __name__ == '__main__':
-    year, month = map(int, sys.argv[1:])
-    edit_month(year, month)
+    edit_month(*map(int, sys.argv[1:]))

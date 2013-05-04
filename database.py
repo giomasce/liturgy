@@ -14,8 +14,7 @@ def from_dict(data, session):
     if '_id' in data:
         obj = session.query(cls).filter(cls.id == data['_id']).one()
     else:
-        raise Exception("Not expected so far")
-        #obj = cls()
+        obj = cls()
     for tag in cls.__fields__:
         obj.__setattr__(tag, data[tag])
     for tag in cls.__dict_fields__:
