@@ -8,6 +8,25 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 db = create_engine('sqlite:///liturgy.sqlite', echo=False)
 Session = sessionmaker(db)
 
+def from_dict(data, session):
+    # TODO - Security
+    cls = eval(data['_type'])
+    if '_id' in data:
+        obj = session.query(cls).filter(cls.id == data['_id']).one()
+    else:
+        raise Exception("Not expected so far")
+        #obj = cls()
+    for tag in cls.__fields__:
+        obj.__setattr__(tag, data[tag])
+    for tag in cls.__dict_fields__:
+        # for i in xrange(len(obj.__getattribute__(tag))):
+        #     del obj.__getattribute__(tag)[0]
+        obj.__setattr__(tag, [])
+        for piece in data[tag]:
+            obj.__getattribute__(tag).append(from_dict(piece, session))
+
+    return obj
+
 class BaseTemplate(object):
 
     def as_dict(self):
@@ -17,6 +36,7 @@ class BaseTemplate(object):
         for tag in self.__dict_fields__:
             res[tag] = map(lambda x: x.as_dict(), self.__getattribute__(tag))
         res['_id'] = self.id
+        res['_type'] = self.__class__.__name__
         return res
 
 Base = declarative_base(db, cls=BaseTemplate)
@@ -68,7 +88,7 @@ class Mass(Base):
         )
 
     id = Column(Integer, primary_key=True)
-    event_id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    event_id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     order = Column(Integer, nullable=False)
     digit = Column(String, nullable=True)
     letter = Column(Integer, nullable=True)
@@ -88,7 +108,7 @@ class Reading(Base):
         )
 
     id = Column(Integer, primary_key=True)
-    mass_id = Column(Integer, ForeignKey(Mass.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    mass_id = Column(Integer, ForeignKey(Mass.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     order = Column(Integer, nullable=False)
     alt_num = Column(Integer, nullable=False)
     title = Column(Unicode, nullable=False)

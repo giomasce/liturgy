@@ -7,7 +7,7 @@ from datetime import date
 
 from movable_dates import get_advent_first
 
-class PrependStream():
+class PrependStream:
 
     def __init__(self, back, prefix):
         self.back = back
