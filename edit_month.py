@@ -21,7 +21,7 @@ def edit_month(year, month, single_day=None):
     editor = Editor()
 
     # From http://stackoverflow.com/questions/15120346/emacs-setting-comment-character-by-file-extension
-    PrependStream(editor.tempfile, '# ').write(u'-*- comment-start: "#"; -*-\n')
+    PrependStream(editor.tempfile, '# ').write(u'-*- coding: utf-8; comment-start: "#"; -*-\n')
     editor.tempfile.write(u'\n')
 
     def push_day(day):

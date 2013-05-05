@@ -17,7 +17,7 @@ def main():
     editor = Editor()
 
     # From http://stackoverflow.com/questions/15120346/emacs-setting-comment-character-by-file-extension
-    PrependStream(editor.tempfile, '# ').write(u'-*- comment-start: "#"; -*-\n')
+    PrependStream(editor.tempfile, '# ').write(u'-*- coding: utf-8; comment-start: "#"; -*-\n')
     PrependStream(editor.tempfile, '# ').write(u'Quote: %s\n' % (reading.quote))
     editor.tempfile.write(u'\n')
     editor.tempfile.write(reading.text)
