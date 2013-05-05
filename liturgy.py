@@ -11,7 +11,7 @@ from sqlalchemy import or_
 from constants import *
 from movable_dates import *
 from utils import int_to_roman, iteryeardates, iterlityeardates
-from database import Session, FixedEvent, MovableEvent, TimedEvent
+from database import Session, FixedEvent, MovableEvent, TimedEvent, Mass
 
 def get_season_beginning(ref_year, season):
     """Returns (first_day, ref_sunday, week_num)."""
@@ -118,6 +118,32 @@ class LitDate(datetime.date):
         if not(len(self.competitors) == 1 or self.competitors[0][0] != self.competitors[1][0]):
             return None
         return self.competitors[0]
+
+    def get_mass(self, strict=True):
+        for priority, competitor in self.competitors:
+
+            # Select compatible masses
+            session = Session.object_session(competitor)
+            masses = session.query(Mass).filter(Mass.event == competitor). \
+                filter(or_(Mass.digit == '*', Mass.digit == self.digit)). \
+                filter(or_(Mass.letter == '*', Mass.letter == self.letter)).order_by(Mass.order.asc()).all()
+
+            # Check that the filtered masses are valid
+            if strict:
+                order_nums = map(lambda x: x.order, masses)
+                if order_nums != range(len(order_nums)):
+                    raise Exception("Wrong masses structure in LiturgyDate %s" % (self))
+
+            # If there is at least one mass, emit the first one
+            if len(masses) > 0:
+                # But first check there is no priority conflict at the selected level
+                if strict:
+                    if len(filter(lambda x: x[0] == priority, self.competitors)) != 1:
+                        raise Exception("Selected event causes a priority conflict in LiturgyDate %s" % (self))
+
+                return masses[0]
+
+        raise Exception("No masses reachable for LiturgyDate %s" % (self))
 
 def compute_movable_calendar(year, session):
     movable_calendar = {}

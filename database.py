@@ -90,7 +90,7 @@ class Mass(Base):
     event_id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     order = Column(Integer, nullable=False)
     digit = Column(String, nullable=True)
-    letter = Column(Integer, nullable=True)
+    letter = Column(String, nullable=True)
     title = Column(Unicode, nullable=True)
     status = Column(Unicode, nullable=False)
 

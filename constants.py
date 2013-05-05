@@ -7,7 +7,7 @@ TYPE_FEAST = 2
 TYPE_MEMORY = 3
 TYPE_OPTIONAL_MEMORY = 4
 
-DIGIT_MAP = {0: 2, 1: 1}
+DIGIT_MAP = {0: '2', 1: '1'}
 LETTER_MAP = {0: 'C', 1: 'A', 2: 'B'}
 PSALTER_WEEK_MAP = {0: 4, 1: 1, 2: 2, 3: 3}
 
