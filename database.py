@@ -5,7 +5,12 @@ from sqlalchemy import create_engine, Column, Integer, String, Unicode, UnicodeT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
-db = create_engine('sqlite:///liturgy.sqlite', echo=False)
+import os
+
+db_filename = 'liturgy.sqlite'
+if 'LITURGY_DB' in os.environ:
+    db_filename = os.environ['LITURGY_DB']
+db = create_engine('sqlite:///%s' % (db_filename), echo=False)
 Session = sessionmaker(db)
 
 def from_dict(data, session):
