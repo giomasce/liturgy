@@ -21,13 +21,13 @@ def from_dict(data, session):
     else:
         obj = cls()
     for tag in cls.__fields__:
-        obj.__setattr__(tag, data[tag])
+        if tag in data:
+            obj.__setattr__(tag, data[tag])
     for tag in cls.__dict_fields__:
-        # for i in xrange(len(obj.__getattribute__(tag))):
-        #     del obj.__getattribute__(tag)[0]
-        obj.__setattr__(tag, [])
-        for piece in data[tag]:
-            obj.__getattribute__(tag).append(from_dict(piece, session))
+        if tag in data:
+            obj.__setattr__(tag, [])
+            for piece in data[tag]:
+                obj.__getattribute__(tag).append(from_dict(piece, session))
 
     return obj
 
@@ -36,7 +36,10 @@ class BaseTemplate(object):
     def as_dict(self):
         res = {}
         for tag in self.__fields__:
-            res[tag] = self.__getattribute__(tag)
+            if tag in self.__masked_fields__:
+                res[tag + '_'] = self.__getattribute__(tag)
+            else:
+                res[tag] = self.__getattribute__(tag)
         for tag in self.__dict_fields__:
             res[tag] = map(lambda x: x.as_dict(), self.__getattribute__(tag))
         res['_id'] = self.id
@@ -58,6 +61,7 @@ class Event(Base):
     __mapper_args__ = {'polymorphic_on': class_type}
 
     __fields__ = ['title', 'status']
+    __masked_fields__ = []
     __dict_fields__ = ['masses']
 
 class FixedEvent(Event):
@@ -103,6 +107,7 @@ class Mass(Base):
                          backref=backref('masses', order_by=order))
 
     __fields__ = ['order', 'digit', 'letter', 'title', 'status']
+    __masked_fields__ = []
     __dict_fields__ = ['readings']
 
 class Reading(Base):
@@ -123,6 +128,7 @@ class Reading(Base):
 
     __fields__ = ['order', 'alt_num', 'title', 'quote', 'text',
                   'quote_status', 'text_status']
+    __masked_fields__ = ['text']
     __dict_fields__ = []
 
     mass = relationship(Mass,
