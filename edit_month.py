@@ -4,6 +4,7 @@
 import sys
 import datetime
 import json
+import traceback
 
 from sqlalchemy.orm.session import object_session
 
@@ -42,20 +43,39 @@ def edit_month(year, month, single_day=None):
 
     editor.edit()
 
-    # TODO - Capture exceptions and give the ability to re-edit
-    # content
-    lines = filter(lambda x: not x.startswith(u'#'), editor.edited_content)
-    buf = u''
-    for line in lines:
-        if line.strip() == u'---===---':
-            data = json.loads(buf)
-            for piece in data:
-                from_dict(piece, session)
-            buf = u''
-        else:
-            buf += line
+    while True:
+        lines = filter(lambda x: not x.startswith(u'#'), editor.edited_content)
+        buf = u''
 
-    session.flush()
+        try:
+            for line in lines:
+                if line.strip() == u'---===---':
+                    data = json.loads(buf)
+                    for piece in data:
+                        from_dict(piece, session)
+                    buf = u''
+                else:
+                    buf += line
+            session.flush()
+
+        except:
+            traceback.print_exc()
+            sys.stdout.write("Error while parsing new content. Re-edit? [Y/n] ")
+            answer = sys.stdin.readline().strip()
+            if answer != '':
+                answer = answer[0]
+            if answer == 'n' or answer == 'N':
+                sys.stdout.write("Aborting\n")
+                sys.exit(0)
+            else:
+                sys.stdout.write("Re-editing...\n")
+                edited_content = editor.edited_content
+                editor = Editor()
+                editor.tempfile.write("".join(edited_content))
+                editor.edit()
+
+        else:
+            break
 
     if editor.confirmation_request():
         #reading.text = new_text
