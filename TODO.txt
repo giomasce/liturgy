@@ -1,0 +1,3 @@
+
+ * Some masses depend on whether they're celebrated on Sunday or not (for instance, 9/11).
+
