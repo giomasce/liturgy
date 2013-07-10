@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import create_engine, Column, Integer, String, Unicode, UnicodeText, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import create_engine, Column, Integer, String, Unicode, UnicodeText, ForeignKey, DateTime, UniqueConstraint, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
@@ -57,10 +57,11 @@ class Event(Base):
     priority = Column(Integer, nullable=True)
     title = Column(Unicode, nullable=False)
     status = Column(Unicode, nullable=False)
+    no_slide = Column(Boolean, nullable=False, default=False)
 
     __mapper_args__ = {'polymorphic_on': class_type}
 
-    __fields__ = ['title', 'status']
+    __fields__ = ['title', 'status', 'no_slide']
     __masked_fields__ = []
     __dict_fields__ = ['masses']
 

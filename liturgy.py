@@ -173,9 +173,15 @@ def build_lit_year(year, session):
 
         # Does this day requires sliding?
         if PRI_TRIDUUM in priorities or PRI_CHRISTMAS in priorities:
-            for competitor in lit_date.competitors:
-                if competitor[0] == PRI_SOLEMNITIES or competitor[0] == PRI_LOCAL_SOLEMNITIES:
-                    queue.append(competitor)
+            for idx, competitor in enumerate(lit_date.competitors):
+                if (competitor[0] == PRI_SOLEMNITIES or competitor[0] == PRI_LOCAL_SOLEMNITIES):
+                    if competitor[1].no_slide:
+                        # Virtually promote solemnity to maximum
+                        # priority, so that it is chosen anyway
+                        competitor[1].priority = PRI_TRIDUUM
+                        lit_date.competitors[idx] = (PRI_TRIDUUM, competitor[1])
+                    else:
+                        queue.append(competitor)
 
         # Does this day receive sliding?
         elif len(queue) > 0 and min(priorities) >= PRI_STRONG_WEEKDAYS:
