@@ -13,6 +13,8 @@ from BeautifulSoup import BeautifulStoneSoup as BSS
 
 import utils
 
+# Abbreviations on Silvestrini's website are in Vatican style
+
 ##
 # Removes HTML or XML character references and entities from a text string.
 # Taken from http://effbot.org/zone/re-sub.htm#unescape-html
