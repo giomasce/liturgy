@@ -126,9 +126,10 @@ class Reading(Base):
     text = Column(UnicodeText, nullable=True)
     quote_status = Column(Unicode, nullable=False)
     text_status = Column(Unicode, nullable=False)
+    only_on_sunday = Column(Boolean, nullable=False)
 
     __fields__ = ['order', 'alt_num', 'title', 'quote', 'text',
-                  'quote_status', 'text_status']
+                  'quote_status', 'text_status', 'only_on_sunday']
     __masked_fields__ = ['text']
     __dict_fields__ = []
 
