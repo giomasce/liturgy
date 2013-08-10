@@ -204,7 +204,9 @@ def print_lit_date(ld, outfile=None, with_id=False):
         outfile = sys.stdout
     print >> outfile, u'%s (weekday: %d, year: %d)%s' % (ld, ld.weekday(), ld.ref_year, ' *' if ld.slid else '')
     for comp in ld.competitors:
-        print >> outfile, u'  %2d: %s%s' % (comp[0], comp[1].title, ' (id: %d)' % (comp[1].id) if with_id else '')
+        print >> outfile, u'  %2d: %s%s [type: %s, priority: %s]' % (comp[0], comp[1].title, ' (id: %d)' % (comp[1].id) if with_id else '',
+                                                                     TYPE_TO_TEXT[comp[1].type],
+                                                                     PRIORITY_TO_TEXT[comp[1].priority])
     print >> outfile, ""
 
 def get_lit_date(date, lit_years, session):

@@ -50,3 +50,30 @@ TYPE_TO_PRIORITY = {
     TYPE_MEMORY: PRI_MEMORIES,
     TYPE_OPTIONAL_MEMORY: PRI_UNCHOSEN_OPT_MEM,
 }
+
+TYPE_TO_TEXT = {
+    TYPE_SOLEMNITY: 'solemnity',
+    TYPE_LORD_FEAST: 'feast of the Lord',
+    TYPE_FEAST: 'feast',
+    TYPE_MEMORY: 'memory',
+    TYPE_OPTIONAL_MEMORY: 'optional memory',
+    None: 'N/A'
+}
+
+PRIORITY_TO_TEXT = {
+    PRI_TRIDUUM: 'triduum',
+    PRI_CHRISTMAS: 'Christmas',
+    PRI_SOLEMNITIES: 'solemnities',
+    PRI_LOCAL_SOLEMNITIES: 'local solemnities',
+    PRI_LORD_FEASTS: 'feasts of the Lord',
+    PRI_SUNDAYS: 'Sundays',
+    PRI_OTHER_FEASTS: 'other feasts',
+    PRI_LOCAL_FEASTS: 'local feasts',
+    PRI_STRONG_WEEKDAYS: 'strong weekdays',
+    PRI_MEMORIES: 'memories',
+    PRI_LOCAL_MEMORIES: 'local memories',
+    PRI_OPTIONAL_MEMORIES: 'optional memories',
+    PRI_WEEKDAYS: 'weekdays',
+    PRI_UNCHOSEN_OPT_MEM: 'unchosen optional memories',
+    None: 'N/A'
+}
