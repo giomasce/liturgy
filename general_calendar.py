@@ -31,6 +31,7 @@ BASE_TITLE_ITALIAN = u'%s della %s settimana del %s'
 GENERAL_CALENDAR_LIST = [
     (1, 1, u"Maria SS. Madre di Dio", TYPE_SOLEMNITY),
     (1, 2, u"Ss. Basilio Magno e Gregorio Nazianzeno, vescovi e dottori della Chiesa", TYPE_MEMORY),
+    (1, 3, u"SS. Nome di Gesù", TYPE_OPTIONAL_MEMORY),
     #(1, 6, u"Epifania del Signore", TYPE_SOLEMNITY),
     (1, 7, u"S. Raimondo da Peñafort", TYPE_OPTIONAL_MEMORY),
     (1, 13, u"S. Ilario, vescovo e dottore della Chiesa", TYPE_OPTIONAL_MEMORY),
