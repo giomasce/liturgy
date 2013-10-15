@@ -49,7 +49,7 @@ GENERAL_CALENDAR_LIST = [
 
     (2, 2, u"Presentazione del Signore", TYPE_LORD_FEAST),
     (2, 3, u"S. Biagio, vescovo e martire", TYPE_OPTIONAL_MEMORY),
-    (2, 4, u"S. Ansgario (Oscar), vescovo", TYPE_OPTIONAL_MEMORY),
+    (2, 3, u"S. Ansgario (Oscar), vescovo", TYPE_OPTIONAL_MEMORY),
     (2, 5, u"S. Agata, vergine e martire", TYPE_MEMORY),
     (2, 6, u"Ss. Paolo Miki e compagni, martiri", TYPE_MEMORY),
     (2, 8, u"S. Girolamo Emiliani", TYPE_OPTIONAL_MEMORY),
