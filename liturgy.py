@@ -179,6 +179,7 @@ def build_lit_year(year, session):
                         # Virtually promote solemnity to maximum
                         # priority, so that it is chosen anyway
                         lit_date.competitors[idx] = (PRI_TRIDUUM, competitor[1])
+                        lit_date.competitors.sort()
                     else:
                         queue.append(competitor)
 
