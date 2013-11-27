@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import re
 
 from database import Session, Reading
 from quote import BibleQuery, decode_quote, convert_quote_psalm_numbering
@@ -13,14 +14,19 @@ def main():
     session = Session()
     bible_query = BibleQuery()
     reading = session.query(Reading).filter(Reading.id == reading_id).one()
+    text = reading.text
 
     editor = Editor()
+
+    # Fix wrong quotation marks
+    text = re.sub(ur'"([a-zA-ZàòùèéÒÀÙÈÉ0-9])', ur'“\1', text, count=0)
+    text = re.sub(ur'([a-zA-ZàòùèéÒÀÙÈÉ0-9\.?!])"', ur'\1”', text, count=0)
 
     # From http://stackoverflow.com/questions/15120346/emacs-setting-comment-character-by-file-extension
     PrependStream(editor.tempfile, '# ').write(u'-*- coding: utf-8; comment-start: "#"; -*-\n')
     PrependStream(editor.tempfile, '# ').write(u'Quote: %s\n' % (reading.quote))
     editor.tempfile.write(u'\n')
-    editor.tempfile.write(reading.text)
+    editor.tempfile.write(text)
     editor.tempfile.write(u'\n')
     try:
         converted_quote = convert_quote_psalm_numbering(reading.quote, False)
