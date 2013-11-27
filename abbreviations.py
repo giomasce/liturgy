@@ -5,6 +5,8 @@
 # from
 PSALMS_ABBR = u"Sal"
 
+# IMPORTANT: We're using Vatican abbreviations for the databases
+
 BOOKS = [
     u"Genesi",
     u"Esodo",
