@@ -19,8 +19,8 @@ def main():
     editor = Editor()
 
     # Fix wrong quotation marks
-    text = re.sub(ur'"([a-zA-ZàòùèéÒÀÙÈÉ0-9])', ur'“\1', text, count=0)
-    text = re.sub(ur'([a-zA-ZàòùèéÒÀÙÈÉ0-9\.?!])"', ur'\1”', text, count=0)
+    text = re.sub(ur'"([a-zA-ZàòùèéìÒÀÙÈÉÌ0-9])', ur'“\1', text, count=0)
+    text = re.sub(ur'([a-zA-ZàòùèéìÒÀÙÈÉÌ0-9\.?!])"', ur'\1”', text, count=0)
 
     # From http://stackoverflow.com/questions/15120346/emacs-setting-comment-character-by-file-extension
     PrependStream(editor.tempfile, '# ').write(u'-*- coding: utf-8; comment-start: "#"; -*-\n')
