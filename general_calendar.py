@@ -69,7 +69,7 @@ GENERAL_CALENDAR_LIST = [
     (3, 17, u"S. Patrizio, vescovo", TYPE_OPTIONAL_MEMORY),
     (3, 18, u"S. Cirillo di Gerusalemme, vescovo e dottore della Chiesa", TYPE_OPTIONAL_MEMORY),
     (3, 19, u"S. Giuseppe, sposo della beata Vergine Maria", TYPE_SOLEMNITY),
-    (3, 23, u"S. Turibio de Mongrovejo, vescovo", TYPE_OPTIONAL_MEMORY),
+    (3, 23, u"S. Turibio de Mogrovejo, vescovo", TYPE_OPTIONAL_MEMORY),
     (3, 25, u"Annunciazione del Signore", TYPE_SOLEMNITY),
 
     (4, 2, u"S. Francesco de Paola, eremita", TYPE_OPTIONAL_MEMORY),
