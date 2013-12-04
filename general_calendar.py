@@ -74,7 +74,7 @@ GENERAL_CALENDAR_LIST = [
 
     (4, 2, u"S. Francesco de Paola, eremita", TYPE_OPTIONAL_MEMORY),
     (4, 4, u"S. Isidoro, vescovo e dottore della Chiesa", TYPE_OPTIONAL_MEMORY),
-    (4, 5, u"S. Vincenzo Ferrer, sacerdone", TYPE_OPTIONAL_MEMORY),
+    (4, 5, u"S. Vincenzo Ferrer, sacerdote", TYPE_OPTIONAL_MEMORY),
     (4, 7, u"S. Giovanni Battista de la Salle, sacerdote", TYPE_MEMORY),
     (4, 11, u"S. Stanislao, vescovo e martire", TYPE_MEMORY),
     (4, 13, u"S. Martino I, papa e martire", TYPE_OPTIONAL_MEMORY),
