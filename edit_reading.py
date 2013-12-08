@@ -14,7 +14,7 @@ def main():
     session = Session()
     bible_query = BibleQuery()
     reading = session.query(Reading).filter(Reading.id == reading_id).one()
-    text = reading.text
+    text = reading.text if reading.text is not None else ""
 
     editor = Editor()
 
@@ -36,7 +36,8 @@ def main():
         print decode_quote(reading.quote, allow_only_chap=True)
         raise
     else:
-        PrependStream(editor.tempfile, '# ').write(u'Quote: %s\nConverted quote: %s\nBible text:\n\n%s' % (reading.quote, converted_quote,  bible_text))
+        bible_text = "\n".join(map(lambda x: x.strip(), bible_text.split('\n')))
+        PrependStream(editor.tempfile, '# ').write(u'Quote: %s\nConverted quote: %s\nBible text:\n\n%s' % (reading.quote, converted_quote, bible_text))
 
     editor.edit()
 
