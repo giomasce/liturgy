@@ -48,6 +48,9 @@ def get_season_beginning(ref_year, season):
 def calc_ref_year(date):
     return date.year if date < get_advent_first(date.year + 1) else date.year + 1
 
+class SelectingMassException(Exception):
+    pass
+
 class LitDate(datetime.date):
 
     def __init__(self, year, month, day):
@@ -132,18 +135,18 @@ class LitDate(datetime.date):
             if strict:
                 order_nums = map(lambda x: x.order, masses)
                 if order_nums != range(len(order_nums)):
-                    raise Exception("Wrong masses structure in LiturgyDate %s" % (self))
+                    raise SelectingMassException("Wrong masses structure in LiturgyDate %s" % (self))
 
             # If there is at least one mass, emit the first one
             if len(masses) > 0:
                 # But first check there is no priority conflict at the selected level
                 if strict:
                     if len(filter(lambda x: x[0] == priority, self.competitors)) != 1:
-                        raise Exception("Selected event causes a priority conflict in LiturgyDate %s" % (self))
+                        raise SelectingMassException("Selected event causes a priority conflict in LiturgyDate %s" % (self))
 
                 return masses[0]
 
-        raise Exception("No masses reachable for LiturgyDate %s" % (self))
+        raise SelectingMassException("No masses reachable for LiturgyDate %s" % (self))
 
 def compute_movable_calendar(year, session):
     movable_calendar = {}
