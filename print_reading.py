@@ -5,9 +5,6 @@ import sys
 import re
 
 from database import Session, Reading
-from quote import BibleQuery, decode_quote, convert_quote_psalm_numbering
-from utils import PrependStream
-from editor import Editor
 
 def main():
     reading_id = int(sys.argv[1])
