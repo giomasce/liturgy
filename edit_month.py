@@ -69,6 +69,7 @@ def edit_month(year, month, single_day=None):
                 sys.exit(0)
             else:
                 sys.stdout.write("Re-editing...\n")
+                session.rollback()
                 edited_content = editor.edited_content
                 editor = Editor()
                 editor.tempfile.write("".join(edited_content))
