@@ -83,7 +83,7 @@ GENERAL_CALENDAR_LIST = [
     (4, 23, u"S. Giorgio, martire", TYPE_OPTIONAL_MEMORY),
     (4, 24, u"S. Fedele da Sigmaringen, sacerdote e martire", TYPE_OPTIONAL_MEMORY),
     (4, 25, u"S. Marco, evangelista", TYPE_FEAST),
-    (4, 28, u"S. Luigi Maria da Montfort, sacerdote", TYPE_OPTIONAL_MEMORY),
+    (4, 28, u"S. Luigi Maria Grignion da Montfort, sacerdote", TYPE_OPTIONAL_MEMORY),
     (4, 28, u"S. Pietro Chanel, sacerdote e martire", TYPE_OPTIONAL_MEMORY),
     (4, 29, u"S. Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia e d'Europa", TYPE_FEAST),
     (4, 30, u"S. Pio V, papa", TYPE_OPTIONAL_MEMORY),
