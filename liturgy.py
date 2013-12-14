@@ -122,7 +122,7 @@ class LitDate(datetime.date):
             return None
         return self.competitors[0]
 
-    def get_mass(self, strict=True):
+    def get_masses(self, strict=True):
         for priority, competitor in self.competitors:
 
             # Select compatible masses
@@ -144,7 +144,7 @@ class LitDate(datetime.date):
                     if len(filter(lambda x: x[0] == priority, self.competitors)) != 1:
                         raise SelectingMassException("Selected event causes a priority conflict in LiturgyDate %s" % (self))
 
-                return masses[0]
+                return masses
 
         raise SelectingMassException("No masses reachable for LiturgyDate %s" % (self))
 
