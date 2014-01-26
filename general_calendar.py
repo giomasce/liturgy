@@ -328,6 +328,7 @@ def populate_base_competitors(session):
     te.season = SEASON_CHRISTMAS
     te.title = u'seconda domenica dopo Natale'
     te.priority = PRI_SUNDAYS
+    session.add(te)
 
     # Weekdays in January
     for day in range(2, 6) + range(7, 13):
