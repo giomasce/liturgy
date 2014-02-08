@@ -48,11 +48,34 @@ def check_readings(session, loud):
             if loud or 'not-canonical' not in status:
                 print "> Reading %d in event %s: quote %s is not canonical" % (reading.id, reading.mass.event.title, reading.quote)
 
+def check_masses(session, loud):
+    for mass in session.query(Mass):
+        # TODO: check readings consistency
+        pass
+
+def check_events(session, loud):
+    for event in session.query(Event).options(joinedload(Event.masses)):
+        status = event.status.split(' ')
+        complete = True
+        at_least_one = False
+        for letter in ['A', 'B', 'C']:
+            for digit in ['1', '2']:
+                good_masses = [mass for mass in event.masses if (mass.letter == letter or mass.letter == '*') and (mass.digit == digit or mass.digit == '*')]
+                if len(good_masses) == 0:
+                    complete = False
+                else:
+                    at_least_one = True
+        if at_least_one and not complete:
+            if loud or 'incomplete' not in status:
+                print "> Event %d with title %s: missing masses" % (event.id, event.title)
+
 def check_db(loud=False, delete_orphans=False):
     session = Session()
 
     check_orphans(session, loud, delete_orphans)
     check_readings(session, loud)
+    check_masses(session, loud)
+    check_events(session, loud)
 
     session.rollback()
     session.close()
