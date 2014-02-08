@@ -57,7 +57,7 @@ def get_easter(year):
     e = (32 + 2 * (b % 4) + 2 * (c // 4) - d - (c % 4)) % 7
     f = d + e - 7 * ((a + 11 * d + 22 * e) // 451) + 114
     month = f // 31
-    day = f % 31 + 1    
+    day = f % 31 + 1
     return datetime.date(year, month, day)
 
 def get_easter_octave(year):
