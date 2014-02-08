@@ -10,7 +10,7 @@ import datetime
 
 from liturgy import calc_ref_year, build_dict_lit_year, print_lit_date, get_lit_date
 from database import Session, Mass, Reading
-from quote import canonical_quote, decode_quote
+from quote import canonicalise_quote, decode_quote
 from scrape import scrape_file
 from utils import real_itermonthdays, PrependStream
 from abbreviations import ABBR_VATICAN
@@ -76,7 +76,7 @@ def import_from_scrape(year, month):
             reading.alt_num = 0
             reading.mass = mass
             reading.title = title
-            reading.quote = canonical_quote(quote)
+            reading.quote = canonicalise_quote(quote)
             reading.text = text
             try:
                 decode_quote(quote, allow_only_chap=True, valid_abbr=ABBR_VATICAN)
@@ -111,7 +111,7 @@ def import_from_scrape(year, month):
 #         date = piece['date']
 #         lit_date = get_lit_date(date, lit_years, session)
 #         event = lit_date.get_winner()[1]
-#         quotes = map(lambda x: [None, canonical_quote(x)], piece['quotes'] + [piece['quote_vangelo']])
+#         quotes = map(lambda x: [None, canonicalise_quote(x)], piece['quotes'] + [piece['quote_vangelo']])
 #         quotes[-1][0] = piece['text_vangelo']
 
 #         mass = Mass()

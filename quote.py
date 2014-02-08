@@ -4,6 +4,9 @@
 from psalms import masoretic_to_septuagint, septuagint_to_masoretic
 from abbreviations import PSALMS_ABBR
 
+class BadQuoteException(Exception):
+    pass
+
 def split_shards(s):
     if s is None:
         return None
@@ -78,14 +81,14 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
     #print quote
 
     verses = []
-    quote = canonical_quote(quote)
+    quote = canonicalise_quote(quote)
     try:
         book, quote = quote.split(' ', 1)
     except ValueError:
-        raise Exception("Could not split %s" % (quote))
+        raise BadQuoteException("Could not split %s" % (quote))
 
     if valid_abbr is not None and book not in valid_abbr:
-        raise Exception("Book %s not valid" % (book))
+        raise BadQuoteException("Book %s not valid" % (book))
 
     quote = quote.replace(' ', '')
     shards = split_shards(quote)
@@ -121,7 +124,7 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
             elif state == 'second_chap':
                 second_chap = chap
             else:
-                raise Exception('Bad syntax for quote %s' % (quote))
+                raise BadQuoteException('Bad syntax for quote %s' % (quote))
         else:
             if state == 'chap':
                 if shard == ',':
@@ -134,7 +137,7 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
                     first_chap = chap
                     state = 'second_chap'
                 else:
-                    raise Exception('Bad syntax for quote %s' % (quote))
+                    raise BadQuoteException('Bad syntax for quote %s' % (quote))
 
             elif state == 'second_chap':
                 verses.append(((book, first_chap, 1),
@@ -144,7 +147,7 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
                 elif shard == ';':
                     state = 'chap'
                 else:
-                    raise Exception('Bad syntax for quote %s' % (quote))
+                    raise BadQuoteException('Bad syntax for quote %s' % (quote))
 
             elif state == 'verse':
                 if shard == '.' or shard == '/' or shard == ';':
@@ -159,7 +162,7 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
                     first_verse = verse
                     state = 'second_unknown'
                 else:
-                    raise Exception('Bad syntax for quote %s' % (quote))
+                    raise BadQuoteException('Bad syntax for quote %s' % (quote))
 
             elif state == 'second_unknown':
                 if shard == ';' or shard == '.' or shard == '/':
@@ -179,7 +182,7 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
                     chap = second_unknown
                     state = 'second_verse'
                 else:
-                    raise Exception('Bad syntax for quote %s' % (quote))
+                    raise BadQuoteException('Bad syntax for quote %s' % (quote))
 
             elif state == 'second_verse':
                 if shard == ';' or shard == '/' or shard == '.':
@@ -192,10 +195,10 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
                     else:
                         state = 'end'
                 else:
-                    raise Exception('Bad syntax for quote %s' % (quote))
+                    raise BadQuoteException('Bad syntax for quote %s' % (quote))
 
             else:
-                raise Exception('Bad syntax for quote %s' % (quote))
+                raise BadQuoteException('Bad syntax for quote %s' % (quote))
 
         now_num = not now_num
 
@@ -216,7 +219,7 @@ def decode_quote(quote, allow_only_chap=False, valid_abbr=None):
 
     return verses
 
-def canonical_quote(quote):
+def canonicalise_quote(quote):
     """Put a synactically valid quote in a canonical form, removing
     all the spaces, except the one separating the book name from the
     verses specification.
@@ -338,7 +341,7 @@ class BibleQuery:
 def test_quote(quote):
     bq = BibleQuery()
     verses = decode_quote(quote)
-    print "%30s: %30s --> %r" % (quote, canonical_quote(quote), verses)
+    print "%30s: %30s --> %r" % (quote, canonicalise_quote(quote), verses)
     #print "  %s" % (bq.get_text(verses))
 
 if __name__ == '__main__':
