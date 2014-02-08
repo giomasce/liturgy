@@ -9,9 +9,22 @@ from scrape import scrape_file
 from utils import real_itermonthdays, PrependStream
 from abbreviations import ABBR_VATICAN
 
-def check_db(loud=False):
-    session = Session()
+from sqlalchemy.orm import joinedload
 
+def check_orphans(session, loud, delete_orphans):
+    for mass in session.query(Mass).options(joinedload(Mass.event)):
+        if mass.event is None:
+            print "> Mass %d is orphan" % (mass.id)
+            if delete_orphans:
+                session.delete(mass)
+
+    for reading in session.query(Reading).options(joinedload(Reading.mass)):
+        if reading.mass is None:
+            print "> Reading %d is orphan" % (reading.id)
+            if delete_orphans:
+                session.delete(reading)
+
+def check_readings(session, loud):
     for reading in session.query(Reading):
         valid_quote = True
         canonical_quote = True
@@ -29,11 +42,17 @@ def check_db(loud=False):
 
         if not valid_quote:
             if loud or 'invalid' not in status:
-                print "> Reading %d: quote %s is invalid" % (reading.id, reading.quote)
+                print "> Reading %d in event %s: quote %s is invalid" % (reading.id, reading.mass.event.title, reading.quote)
 
         if not canonical_quote:
             if loud or 'not-canonical' not in status:
-                print "> Reading %d: quote %s is not canonical" % (reading.id, reading.quote)
+                print "> Reading %d in event %s: quote %s is not canonical" % (reading.id, reading.mass.event.title, reading.quote)
+
+def check_db(loud=False, delete_orphans=False):
+    session = Session()
+
+    check_orphans(session, loud, delete_orphans)
+    check_readings(session, loud)
 
     session.rollback()
     session.close()
@@ -42,4 +61,5 @@ if __name__ == '__main__':
     import locale
     import codecs
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
-    check_db(loud='loud' in sys.argv[1:])
+    check_db(loud='loud' in sys.argv[1:],
+             delete_orphans='delete-orphans' in sys.argv[1:])
