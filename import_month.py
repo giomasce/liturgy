@@ -8,7 +8,7 @@ import yaml
 import json
 import datetime
 
-from liturgy import calc_ref_year, build_dict_lit_year, print_lit_date, get_lit_date
+from liturgy import calc_ref_year, build_dict_lit_year, print_lit_date, get_lit_date, SelectingMassException
 from database import Session, Mass, Reading
 from quote import canonicalise_quote, decode_quote
 from scrape import scrape_file
@@ -25,7 +25,12 @@ def import_from_scrape(year, month):
         lit_date = get_lit_date(date, lit_years, session)
 
         # Check if we already have a mass here
-        if len(lit_date.get_masses(strict=False)) > 0:
+        try:
+            lit_date.get_masses(strict=False)
+        except SelectingMassException:
+            pass
+        else:
+            print >> sys.stderr, "  * skipping because a valid mass already exists"
             continue
 
         event = lit_date.get_winner()[1]
