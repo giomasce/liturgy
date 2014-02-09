@@ -77,6 +77,7 @@ def check_db(loud=False, delete_orphans=False):
     check_masses(session, loud)
     check_events(session, loud)
 
+    #session.commit()
     session.rollback()
     session.close()
 
