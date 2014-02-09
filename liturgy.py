@@ -125,8 +125,13 @@ class LitDate(datetime.date):
     def get_masses(self, strict=True):
         for priority, competitor in self.competitors:
 
-            # Select compatible masses
             session = Session.object_session(competitor)
+
+            # Check if there is at least a mass in the competitor
+            if session.query(Mass).filter(Mass.event == competitor).count() == 0:
+                continue
+
+            # Select compatible masses
             masses = session.query(Mass).filter(Mass.event == competitor). \
                 filter(or_(Mass.digit == '*', Mass.digit == self.digit)). \
                 filter(or_(Mass.letter == '*', Mass.letter == self.letter)).order_by(Mass.order.asc()).all()
@@ -137,7 +142,7 @@ class LitDate(datetime.date):
                 if order_nums != range(len(order_nums)):
                     raise SelectingMassException("Wrong masses structure in LiturgyDate %s" % (self))
 
-            # If there is at least one mass, emit the first one
+            # If there is at least one mass, emit all of them
             if len(masses) > 0:
                 # But first check there is no priority conflict at the selected level
                 if strict:
@@ -145,6 +150,11 @@ class LitDate(datetime.date):
                         raise SelectingMassException("Selected event causes a priority conflict in LiturgyDate %s" % (self))
 
                 return masses
+
+            # If not, some masses are missing and we report
+            # accordingly
+            else:
+                raise SelectingMassException("Masses missing in LiturgyDate %s" % (self))
 
         raise SelectingMassException("No masses reachable for LiturgyDate %s" % (self))
 
