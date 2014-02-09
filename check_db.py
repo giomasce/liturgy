@@ -24,11 +24,12 @@ def check_orphans(session, loud, delete_orphans):
             if delete_orphans:
                 session.delete(reading)
 
-def check_readings(session, loud):
+def check_readings(session, loud, fix):
     for reading in session.query(Reading):
         valid_quote = True
         canonical_quote = True
-        status = reading.quote_status.split(' ')
+        quote_status = reading.quote_status.split(' ')
+        text_status = reading.text_status.split(' ')
 
         # Try to decode quote
         try:
@@ -41,12 +42,22 @@ def check_readings(session, loud):
             canonical_quote = False
 
         if not valid_quote:
-            if loud or 'invalid' not in status:
+            if loud or 'invalid' not in quote_status:
                 print "> Reading %d in event %s: quote %s is invalid" % (reading.id, reading.mass.event.title, reading.quote)
 
         if not canonical_quote:
-            if loud or 'not-canonical' not in status:
+            if loud or 'not-canonical' not in quote_status:
                 print "> Reading %d in event %s: quote %s is not canonical" % (reading.id, reading.mass.event.title, reading.quote)
+
+        # Check if text is the empty string (should never happen)
+        if reading.text == '':
+            print "> Reading %d in event %s: text is the empty string" % (reading.id, reading.mass.event.title)
+            if fix:
+                reading.text = None
+
+        # Ensure that text is None iff the status contains "missing"
+        if (reading.text is None) != ('missing' in text_status):
+            print "> Reading %d in event %s: text presence is not aligned with status" % (reading.id, reading.mass.event.title)
 
 def check_masses(session, loud):
     for mass in session.query(Mass):
@@ -69,11 +80,11 @@ def check_events(session, loud):
             if loud or 'incomplete' not in status:
                 print "> Event %d with title %s: missing masses" % (event.id, event.title)
 
-def check_db(loud=False, delete_orphans=False):
+def check_db(loud=False, delete_orphans=False, fix=False):
     session = Session()
 
     check_orphans(session, loud, delete_orphans)
-    check_readings(session, loud)
+    check_readings(session, loud, fix)
     check_masses(session, loud)
     check_events(session, loud)
 
@@ -86,4 +97,5 @@ if __name__ == '__main__':
     import codecs
     sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
     check_db(loud='loud' in sys.argv[1:],
-             delete_orphans='delete-orphans' in sys.argv[1:])
+             delete_orphans='delete-orphans' in sys.argv[1:],
+             fix='fix' in sys.argv[1:])
