@@ -23,6 +23,11 @@ def import_from_scrape(year, month):
         date = datetime.date(year, month, day)
         print >> sys.stderr, "Importing %s..." % (date)
         lit_date = get_lit_date(date, lit_years, session)
+
+        # Check if we already have a mass here
+        if len(lit_date.get_masses(strict=False)) > 0:
+            continue
+
         event = lit_date.get_winner()[1]
         with open(os.path.join('scrape', '%04d-%02d-%02d.html' % (year, month, day))) as fhtml:
             quotes = scrape_file(fhtml)
