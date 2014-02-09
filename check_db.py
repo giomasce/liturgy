@@ -59,6 +59,12 @@ def check_readings(session, loud, fix):
         if (reading.text is None) != ('missing' in text_status):
             print "> Reading %d in event %s: text presence is not aligned with status" % (reading.id, reading.mass.event.title)
 
+        # Ensure that if text is ok, then it is padded to 80 columns
+        if 'ok' in text_status:
+            lines = reading.text.splitlines()
+            if max([len(line.strip()) for line in lines]) > 80:
+                print "> Reading %d in event %s: there are long lines" % (reading.id, reading.mass.event.title)
+
 def check_masses(session, loud):
     for mass in session.query(Mass):
         # TODO: check readings consistency
@@ -79,6 +85,9 @@ def check_events(session, loud):
         if at_least_one and not complete:
             if loud or 'incomplete' not in status:
                 print "> Event %d with title %s: missing masses" % (event.id, event.title)
+
+    # TODO: check that readings with corresponding quotes in different
+    # masses belonging to the same event actually have the same text
 
 def check_db(loud=False, delete_orphans=False, fix=False):
     session = Session()
