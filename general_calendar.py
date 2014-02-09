@@ -219,7 +219,7 @@ GENERAL_CALENDAR_LIST = [
     #(11, 2, u"Commemoriazione di tutti i fedeli defunti", TYPE_SOLEMNITY),
     (11, 3, u"S. Martino de Porres, religioso", TYPE_OPTIONAL_MEMORY),
     (11, 4, u"S. Carlo Borromeo, vescovo", TYPE_MEMORY),
-    (11, 9, u"Dedicazione della Basilica Lateranense", TYPE_FEAST),
+    (11, 9, u"Dedicazione della Basilica Lateranense", TYPE_LORD_FEAST),
     (11, 10, u"S. Leone Magno, papa e dottore della Chiesa", TYPE_MEMORY),
     (11, 11, u"S. Martino di Tours, vescovo", TYPE_MEMORY),
     (11, 12, u"S. Giosafat, vescovo e martire", TYPE_MEMORY),
