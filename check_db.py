@@ -67,8 +67,12 @@ def check_readings(session, loud, fix):
 
 def check_masses(session, loud):
     for mass in session.query(Mass):
-        # TODO: check readings consistency
-        pass
+
+        # Check that at least one between digit and letter is '*'
+        if mass.digit != '*' and mass.letter != '*':
+            print "> Mass %d in event %s: wrong digit or letter" % (mass.id, mass.event.title)
+
+    # TODO: check readings consistency
 
 def check_events(session, loud):
     for event in session.query(Event).options(joinedload(Event.masses)):
