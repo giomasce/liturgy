@@ -124,10 +124,22 @@ class LitDate(datetime.date):
         choices = [c for c in self.competitors if c[0] == self.competitors[0][0]]
         if len(choices) == 1:
             return choices[0]
-        return solve_conflict(self, choices)
+        return solve_conflict(self, choices)[0]
 
     def get_masses(self, strict=True):
-        for priority, competitor in self.competitors:
+        for i in xrange(len(self.competitors)):
+            priority = self.competitors[i][0]
+            competitor = self.competitors[i][1]
+
+            # If there are conflicts and we are in strict mode, invoke
+            # the conflict resolution logic
+            if strict:
+                choices = filter(lambda x: x[0] == priority, self.competitors)
+                assert self.competitors[i:i+len(choices)] == choices
+                if len(choices) > 1:
+                    self.competitors[i:i+len(choices)] = solve_conflict(self, choices)
+                    priority = self.competitors[i][0]
+                    competitor = self.competitors[i][1]
 
             session = Session.object_session(competitor)
 
@@ -148,11 +160,6 @@ class LitDate(datetime.date):
 
             # If there is at least one mass, emit all of them
             if len(masses) > 0:
-                # But first check there is no priority conflict at the selected level
-                if strict:
-                    if len(filter(lambda x: x[0] == priority, self.competitors)) != 1:
-                        raise SelectingMassException("Selected event causes a priority conflict in LiturgyDate %s" % (self))
-
                 return masses
 
             # If not, some masses are missing and we report
