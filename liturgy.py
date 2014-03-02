@@ -12,6 +12,7 @@ from constants import *
 from movable_dates import *
 from utils import int_to_roman, iteryeardates, iterlityeardates
 from database import Session, FixedEvent, MovableEvent, TimedEvent, Mass
+from chooser import solve_conflict
 
 def get_season_beginning(ref_year, season):
     """Returns (first_day, ref_sunday, week_num)."""
@@ -118,9 +119,12 @@ class LitDate(datetime.date):
         return sorted(res, key=lambda x: x[0])
 
     def get_winner(self):
-        if not(len(self.competitors) == 1 or self.competitors[0][0] != self.competitors[1][0]):
+        if len(self.competitors) == 0:
             return None
-        return self.competitors[0]
+        choices = [c for c in self.competitors if c[0] == self.competitors[0][0]]
+        if len(choices) == 1:
+            return choices[0]
+        return solve_conflict(self, choices)
 
     def get_masses(self, strict=True):
         for priority, competitor in self.competitors:
