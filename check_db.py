@@ -67,10 +67,18 @@ def check_readings(session, loud, fix):
 
 def check_masses(session, loud):
     for mass in session.query(Mass):
+        status = mass.status.split(' ')
 
         # Check that at least one between digit and letter is '*'
         if mass.digit != '*' and mass.letter != '*':
-            print "> Mass %d in event %s: wrong digit or letter" % (mass.id, mass.event.title)
+            if loud or 'both-digit-letter' not in status:
+                print "> Mass %d in event %s: wrong digit or letter" % (mass.id, mass.event.title)
+
+        # Check that digit and letter are valid
+        if mass.digit not in ['1', '2', '*']:
+            print "> Mass %d in event %s: wrong digit '%s'" % (mass.id, mass.event.title, mass.digit)
+        if mass.letter not in ['A', 'B', 'C', '*']:
+            print "> Mass %d in event %s: wrong letter '%s'" % (mass.id, mass.event.title, mass.letter)
 
     # TODO: check readings consistency
 
