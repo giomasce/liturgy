@@ -118,13 +118,32 @@ class LitDate(datetime.date):
         res += self._get_movable_competitors(movable_calendar)
         return sorted(res, key=lambda x: x[0])
 
-    def get_winner(self):
+    def get_winner(self, remove_ok=False):
         if len(self.competitors) == 0:
             return None
-        choices = [c for c in self.competitors if c[0] == self.competitors[0][0]]
+
+        # Split competitors in classes of equal priority
+        classes = []
+        label = None
+        this_class = None
+        for c in self.competitors:
+            if remove_ok and 'ok' in c[1].status.split(' ') and 'incomplete' not in c[1].status.split(' '):
+                continue
+            if label is None or c[0] != label:
+                assert c[0] > label
+                label = c[0]
+                if this_class is not None:
+                    classes.append(this_class)
+                this_class = []
+            this_class.append(c)
+        if this_class is not None:
+            classes.append(this_class)
+
+        choices = classes[0]
         if len(choices) == 1:
             return choices[0]
-        return solve_conflict(self, choices)[0]
+        else:
+            return solve_conflict(self, choices)[0]
 
     def get_masses(self, strict=True):
         for i in xrange(len(self.competitors)):

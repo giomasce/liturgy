@@ -33,7 +33,7 @@ def import_from_scrape(year, month):
             print >> sys.stderr, "  * skipping because a valid mass already exists"
             continue
 
-        event = lit_date.get_winner()[1]
+        event = lit_date.get_winner(remove_ok=True)[1]
         with open(os.path.join('scrape', '%04d-%02d-%02d.html' % (year, month, day))) as fhtml:
             quotes = scrape_file(fhtml)
 
