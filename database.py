@@ -13,21 +13,43 @@ if 'LITURGY_DB' in os.environ:
 db = create_engine('sqlite:///%s' % (db_filename), echo=False)
 Session = sessionmaker(db)
 
+# From http://stackoverflow.com/a/17246726/807307
+def get_subclasses(c):
+    subclasses = c.__subclasses__()
+    for d in list(subclasses):
+        subclasses.extend(get_subclasses(d))
+    return subclasses
+
 def from_dict(data, session):
-    # TODO - Security
-    cls = eval(data['_type'])
+    subclasses = get_subclasses(Base)
+    [cls] = [x for x in subclasses if x.__name__ == data['_type']]
+
+    # Retrieve or create the object
     if '_id' in data:
         obj = session.query(cls).filter(cls.id == data['_id']).one()
     else:
         obj = cls()
-    for tag in cls.__fields__:
-        if tag in data:
-            obj.__setattr__(tag, data[tag])
-    for tag in cls.__dict_fields__:
-        if tag in data:
+
+    # Copy fields from data
+    if '_copy_from' not in data or data['_copy_from'] is None:
+        for tag in cls.__fields__:
+            if tag in data:
+                obj.__setattr__(tag, data[tag])
+        for tag in cls.__dict_fields__:
+            if tag in data:
+                obj.__setattr__(tag, [])
+                for piece in data[tag]:
+                    obj.__getattribute__(tag).append(from_dict(piece, session))
+
+    # Copy fields from another reference object
+    else:
+        src_obj = session.query(cls).filter(cls.id == data['_copy_from']).one()
+        for tag in cls.__fields__:
+            obj.__setattr__(tag, src_obj.__getattribute__(tag))
+        for tag in cls.__dict_fields__:
             obj.__setattr__(tag, [])
-            for piece in data[tag]:
-                obj.__getattribute__(tag).append(from_dict(piece, session))
+            for piece in src_obj.__getattribute__(tag):
+                obj.__getattribute__(tag).append(piece)
 
     return obj
 
@@ -135,6 +157,11 @@ class Reading(Base):
 
     mass = relationship(Mass,
                         backref=backref('readings', order_by=(order, alt_num)))
+
+    def as_dict(self):
+        res = Base.as_dict(self)
+        res['_copy_from'] = None
+        return res
 
     def my_yaml_export(self, spaces=0):
         res = ''
