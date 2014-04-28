@@ -197,7 +197,7 @@ GENERAL_CALENDAR_LIST = [
     (10, 1, u"S. Teresa di Gesù Bambino, vergine e dottore della Chiesa", TYPE_MEMORY),
     (10, 2, u"Ss. Angeli Custodi", TYPE_MEMORY),
     (10, 4, u"S. Francesco d'Assisi, patrono d'Italia", TYPE_FEAST),
-    (10, 6, u"S. Bruno, monato", TYPE_OPTIONAL_MEMORY),
+    (10, 6, u"S. Bruno, monaco", TYPE_OPTIONAL_MEMORY),
     (10, 7, u"Beata Vergine Maria del Rosario", TYPE_MEMORY),
     (10, 9, u"Ss. Dionigi, vescovo, e compagni, martiri", TYPE_OPTIONAL_MEMORY),
     (10, 9, u"S. Giovanni Leonardi, sacerdote", TYPE_OPTIONAL_MEMORY),
