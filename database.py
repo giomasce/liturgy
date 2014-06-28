@@ -80,10 +80,11 @@ class Event(Base):
     title = Column(Unicode, nullable=False)
     status = Column(Unicode, nullable=False)
     no_slide = Column(Boolean, nullable=False, default=False)
+    no_masses = Column(Boolean, nullable=False, default=False)
 
     __mapper_args__ = {'polymorphic_on': class_type}
 
-    __fields__ = ['title', 'status', 'no_slide']
+    __fields__ = ['title', 'status', 'no_slide', 'no_masses']
     __masked_fields__ = []
     __dict_fields__ = ['masses']
 

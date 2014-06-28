@@ -127,6 +127,8 @@ class LitDate(datetime.date):
         label = None
         this_class = None
         for c in self.competitors:
+            if c[1].no_masses:
+                return None
             if remove_ok and 'ok' in c[1].status.split(' ') and 'incomplete' not in c[1].status.split(' '):
                 continue
             if label is None or c[0] != label:
@@ -161,6 +163,11 @@ class LitDate(datetime.date):
                     competitor = self.competitors[i][1]
 
             session = Session.object_session(competitor)
+
+            # Check whethere there are masses today (there aren't only
+            # on Holy Saturday)
+            if competitor.no_masses:
+                raise SelectingMassException("No masses for today")
 
             # Check if there is at least a mass in the competitor
             if session.query(Mass).filter(Mass.event == competitor).count() == 0:
