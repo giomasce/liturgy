@@ -28,6 +28,7 @@ def main():
     editor.tempfile.write(u'\n')
     editor.tempfile.write(text)
     editor.tempfile.write(u'\n')
+    PrependStream(editor.tempfile, '# ').write(u'Useful characters: “”–\n\n')
     try:
         converted_quote = convert_quote_psalm_numbering(reading.quote, False)
         bible_text = bible_query.get_text(decode_quote(converted_quote, allow_only_chap=True))
