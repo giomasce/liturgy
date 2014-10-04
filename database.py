@@ -1,17 +1,36 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import create_engine, Column, Integer, String, Unicode, UnicodeText, ForeignKey, DateTime, UniqueConstraint, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, Unicode, UnicodeText, ForeignKey, DateTime, UniqueConstraint, Boolean, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
 import os
+import weakref
+import sys
 
 db_filename = 'liturgy.sqlite'
 if 'LITURGY_DB' in os.environ:
     db_filename = os.environ['LITURGY_DB']
 db = create_engine('sqlite:///%s' % (db_filename), echo=False)
 Session = sessionmaker(db)
+transactions_with_flushes = weakref.WeakSet()
+
+def flush_changes_anything(session):
+    return any(session.new) or any(session.deleted) or any([x for x in session.dirty if session.is_modified(x)])
+
+@event.listens_for(Session, "after_flush")
+def log_transaction(session, flush_context):
+    #print >> sys.stderr, "> Flushing transaction with %s" % ((session.new, session.dirty, session.deleted),)
+    #print >> sys.stderr, ">   Dirty objects map: %s" % ([session.is_modified(x) for x in session.dirty],)
+    #print >> sys.stderr, ">   Flush will change anything? %s" % (flush_changes_anything(session),)
+    if flush_changes_anything(session):
+        for trans in session.transaction._iterate_parents():
+            transactions_with_flushes.add(trans)
+
+def session_has_pending_commit(session):
+    session.flush()
+    return session.transaction in transactions_with_flushes
 
 # From http://stackoverflow.com/a/17246726/807307
 def get_subclasses(c):
@@ -37,9 +56,22 @@ def from_dict(data, session):
                 obj.__setattr__(tag, data[tag])
         for tag in cls.__dict_fields__:
             if tag in data:
-                obj.__setattr__(tag, [])
+                # If objects in the list have the same id's as those
+                # on database, we could avoid destroying and
+                # recreating the list; this way we help identifying
+                # when there are not changes to the database; we also
+                # help avoiding useless flushes, since we reduce the
+                # iterleaving between SELECTs and INSERTs; apparently
+                # reducing interleaving already appears to solve all
+                # the problems, so list recreation avoidance is
+                # disabled (commented if line)
+                tmp_list = []
                 for piece in data[tag]:
-                    obj.__getattribute__(tag).append(from_dict(piece, session))
+                    tmp_list.append(from_dict(piece, session))
+                #if set([x.id for x in tmp_list]) != set([x.id for x in obj.__getattribute__(tag)]):
+                obj.__setattr__(tag, [])
+                for child in tmp_list:
+                    obj.__getattribute__(tag).append(child)
 
     # Copy fields from another reference object
     else:

@@ -25,7 +25,7 @@ class Editor:
 
     def confirmation_request(self, changed=True):
         if not changed:
-            sys.stdout.write("Text wasn't modified, ignoring...\n")
+            sys.stdout.write("Nothing was modified, ignoring...\n")
             return False
         else:
             sys.stdout.write("Confirm changes? [y/N] ")

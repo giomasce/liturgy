@@ -9,7 +9,7 @@ import traceback
 from sqlalchemy.orm.session import object_session
 
 from liturgy import get_lit_date, print_lit_date
-from database import Session, Reading, from_dict
+from database import Session, Reading, from_dict, session_has_pending_commit
 from quote import BibleQuery, decode_quote, convert_quote_psalm_numbering
 from utils import PrependStream, real_itermonthdays
 from editor import Editor
@@ -78,7 +78,7 @@ def edit_month(year, month, single_day=None):
         else:
             break
 
-    if editor.confirmation_request():
+    if editor.confirmation_request(session_has_pending_commit(session)):
         #reading.text = new_text
         session.commit()
     else:
