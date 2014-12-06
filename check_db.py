@@ -72,7 +72,7 @@ def check_masses(session, loud):
         # Check that at least one between digit and letter is '*'
         if mass.digit != '*' and mass.letter != '*':
             if loud or 'both-digit-letter' not in status:
-                print "> Mass %d in event %s: wrong digit or letter" % (mass.id, mass.event.title)
+                print "> Mass %d in event %s: wrong digit or letter%s" % (mass.id, mass.event.title if mass.event is not None else 'None', ' (silenced)' if 'both-digit-letter' in status else '')
 
         # Check that digit and letter are valid
         if mass.digit not in ['1', '2', '*']:
