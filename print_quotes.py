@@ -32,7 +32,7 @@ def main():
         quotes = []
         alt_quotes = []
 
-        print >> fout, "Mass #%d (%s) - ID: %d" % (mass.order, mass.title, mass.id)
+        print >> fout, "Mass #%d (%s) in event %s - ID: %d" % (mass.order, mass.title, mass.event.title, mass.id)
         for reading in sorted(mass.readings, key=lambda x: (x.order, x.alt_num)):
             print >> fout, "  Lettura #%d.%d (%s): %s - ID: %d" % (reading.order, reading.alt_num, reading.title, reading.quote, reading.id)
 
