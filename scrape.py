@@ -43,13 +43,21 @@ def unescape(text):
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
 
+def my_generator(piece):
+    for thing in piece.childGenerator():
+        if 'name' in thing.__dict__ and thing.name == 'p':
+            for thing2 in my_generator(thing):
+                yield thing2
+        else:
+            yield thing
+
 def interpret_div(div, h3_title, terminator, skip_heading=False):
     quote = None
     text = None
-    for thing in div.childGenerator():
+    for thing in my_generator(div):
         if 'name' in thing.__dict__:
             if thing.name == 'h3':
-                if thing.text.startswith(h3_title):
+                if thing.text.upper().startswith(h3_title):
                     text = ''
             elif thing.name == 'em':
                 if quote is None:
@@ -57,6 +65,8 @@ def interpret_div(div, h3_title, terminator, skip_heading=False):
             elif thing.name == 'br':
                 if text is not None and text != '':
                     text += '\n\n'
+            elif thing.name in ['strong', 'div']:
+                pass
             else:
                 assert False, "Unkown tag %s" % (thing.name)
         else:
