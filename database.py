@@ -117,6 +117,7 @@ class Event(Base):
     __mapper_args__ = {'polymorphic_on': class_type}
 
     __fields__ = ['title', 'status', 'no_slide', 'no_masses']
+    #__fields__ += ['priority']
     __masked_fields__ = []
     __dict_fields__ = ['masses']
 
@@ -129,6 +130,8 @@ class FixedEvent(Event):
     month = Column(Integer, nullable=False)
     season = Column(Integer, nullable=True)
 
+    #__fields__ = Event.__fields__ + ['day', 'month', 'season']
+
 class TimedEvent(Event):
     __tablename__ = 'timed_events'
     __mapper_args__ = {'polymorphic_identity': 'timed'}
@@ -138,12 +141,16 @@ class TimedEvent(Event):
     week = Column(Integer, nullable=False)
     season = Column(Integer, nullable=False)
 
+    #__fields__ = Event.__fields__ + ['weekday', 'week', 'season']
+
 class MovableEvent(Event):
     __tablename__ = 'movable_events'
     __mapper_args__ = {'polymorphic_identity': 'movable'}
 
     id = Column(Integer, ForeignKey(Event.id, onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     calc_func = Column(Unicode, nullable=False)
+
+    #__fields__ = Event.__fields__ + ['calc_func']
 
 class Mass(Base):
     __tablename__ = 'masses'
