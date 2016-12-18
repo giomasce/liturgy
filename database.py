@@ -25,8 +25,10 @@ def log_transaction(session, flush_context):
     #print >> sys.stderr, ">   Dirty objects map: %s" % ([session.is_modified(x) for x in session.dirty],)
     #print >> sys.stderr, ">   Flush will change anything? %s" % (flush_changes_anything(session),)
     if flush_changes_anything(session):
-        for trans in session.transaction._iterate_parents():
+        trans = session.transaction
+        while trans is not None:
             transactions_with_flushes.add(trans)
+            trans = trans.parent
 
 def session_has_pending_commit(session):
     session.flush()
