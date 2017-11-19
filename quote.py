@@ -301,6 +301,30 @@ def convert_quote_psalm_numbering(quote, to_septuagint):
     except:
         return quote
 
+def quotes_intersect(q1, q2):
+    """Return if the two quotes, as returned by decode_quote(), have
+    intersection.
+
+    """
+    # Less then or equal comparison
+    def lte(x1, x2):
+        # Check that they are from the same book
+        if x1[0] != x2[0]:
+            return False
+        # Convert to int
+        y1 = (int(x1[1]), my_int(x1[2]))
+        y2 = (int(x2[1]), my_int(x2[2]))
+        # Compare lexicographically
+        return y1 <= y2
+
+    for el1 in q1:
+        # Check that each quote mentions exactly one book
+        assert el1[0][0] == el1[1][0]
+        for el2 in q2:
+            if el1[0] <= el2[0] <= el1[1] or el2[0] <= el1[0] <= el2[1]:
+                return True
+    return False
+
 class BibleQuery:
 
     def __init__(self, db_filename=None):
@@ -344,6 +368,12 @@ def test_quote(quote):
     print "%30s: %30s --> %r" % (quote, canonicalise_quote(quote), verses)
     #print "  %s" % (bq.get_text(verses))
 
+def test_quote_intersection(q1, q2):
+    bq = BibleQuery()
+    v1 = decode_quote(q1)
+    v2 = decode_quote(q2)
+    print "%30s - %30s --> %s" % (q1, q2, quotes_intersect(v1, v2))
+
 if __name__ == '__main__':
     test_quote('1Gv 5,5b-13a')
     test_quote('1 Gv 5,5b-13a')
@@ -351,3 +381,12 @@ if __name__ == '__main__':
     test_quote('Mt 4, 12-17, 23   ')
     test_quote('Mt 4, 12-17, 23 ; 18,24.26-29c')
     test_quote('Nm 13,1-3a.25-14,1.26-30.34-35')
+
+    test_quote_intersection("Gv 1,1-10", "Gv 1,1-10")
+    test_quote_intersection("Gv 1,1-10", "Gv 1,10-20")
+    test_quote_intersection("Gv 1,1-10", "Gv 1,15-20")
+    test_quote_intersection("Gv 1,1-10", "Gn 1,15-20")
+    test_quote_intersection("Gv 1,1-10.20-30", "Gv 1,15-16")
+    test_quote_intersection("Gv 1,1-10.20-30", "Gv 1,15-16.25-26")
+    test_quote_intersection("Gv 1,1-10.20-30", "Gv 2,15-16.25-26")
+    test_quote_intersection("Gv 1,1-5,10.20-30", "Gv 2,15-16.25-26")
