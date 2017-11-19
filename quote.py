@@ -317,11 +317,15 @@ def quotes_intersect(q1, q2):
         # Compare lexicographically
         return y1 <= y2
 
+    # Check that each quote mentions exactly one book
     for el1 in q1:
-        # Check that each quote mentions exactly one book
         assert el1[0][0] == el1[1][0]
+    for el2 in q2:
+        assert el2[0][0] == el2[1][0]
+
+    for el1 in q1:
         for el2 in q2:
-            if el1[0] <= el2[0] <= el1[1] or el2[0] <= el1[0] <= el2[1]:
+            if lte(el1[0], el2[0]) and lte(el2[0], el1[1]) or lte(el2[0], el1[0]) and lte(el1[0], el2[1]):
                 return True
     return False
 
@@ -390,3 +394,4 @@ if __name__ == '__main__':
     test_quote_intersection("Gv 1,1-10.20-30", "Gv 1,15-16.25-26")
     test_quote_intersection("Gv 1,1-10.20-30", "Gv 2,15-16.25-26")
     test_quote_intersection("Gv 1,1-5,10.20-30", "Gv 2,15-16.25-26")
+    test_quote_intersection("Mc 3,13-19", "Mc 3,1-6")

@@ -39,7 +39,7 @@ def main():
                 except BadQuoteException:
                     pass
                 if quotes_intersect(quote, verses):
-                    print date
+                    print "%s: %s" % (date, reading.quote)
                     found = True
                     break
         date += datetime.timedelta(days=1)
